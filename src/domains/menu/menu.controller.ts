@@ -1,7 +1,6 @@
-// src/menus/menu.controller.ts
-import { Controller, Post, Get, Param, Body, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Delete, Patch } from '@nestjs/common';
 import { MenuService } from './menu.service';
-import { CreateMenuDto } from './dto/menu.dto';
+import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 
 @Controller('menus')
 export class MenuController {
@@ -20,6 +19,11 @@ export class MenuController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.menuService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateMenuDto) {
+    return this.menuService.update(id, dto);
   }
 
   @Delete(':id')

@@ -1,5 +1,5 @@
-// src/menus/dto/create-menu.dto.ts
-import { IsString, IsOptional, IsMongoId, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsMongoId, IsBoolean, IsEnum } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateMenuDto {
   @IsString()
@@ -10,11 +10,23 @@ export class CreateMenuDto {
 
   @IsOptional()
   @IsString()
+  readonly description?: string;
+
+  @IsOptional()
+  @IsString()
   readonly icon?: string;
 
   @IsOptional()
   @IsString()
   readonly path?: string;
+
+  @IsOptional()
+  @IsString()
+  readonly externalUrl?: string;
+
+  @IsOptional()
+  @IsEnum(['route', 'group', 'link', 'divider'])
+  readonly type?: 'route' | 'group' | 'link' | 'divider';
 
   @IsOptional()
   @IsMongoId()
@@ -23,4 +35,10 @@ export class CreateMenuDto {
   @IsOptional()
   @IsBoolean()
   readonly isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly hidden?: boolean;
 }
+
+export class UpdateMenuDto extends PartialType(CreateMenuDto) {}

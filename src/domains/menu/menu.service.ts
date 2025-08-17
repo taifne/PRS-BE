@@ -2,7 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateMenuDto } from './dto/menu.dto';
+import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { Menu, MenuDocument } from './menu.schema';
 
 @Injectable()
@@ -23,6 +23,9 @@ export class MenuService {
     if (!menu) throw new NotFoundException('Menu not found');
     return menu;
   }
+async update(id: string, dto: UpdateMenuDto): Promise<Menu> {
+  return this.menuModel.findByIdAndUpdate(id, dto, { new: true });
+}
 
   async delete(id: string): Promise<void> {
     const result = await this.menuModel.deleteOne({ _id: id }).exec();
