@@ -1,9 +1,14 @@
 // src/menus/menu.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { Menu, MenuDocument } from './menu.schema';
+import { Messages } from 'src/common/message/messages';
 
 @Injectable()
 export class MenuService {
@@ -19,16 +24,43 @@ export class MenuService {
   }
 
   async findOne(id: string): Promise<Menu> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(
+        Messages.error.validation.invalidFormat('menu ID'),
+      );
+    }
+
     const menu = await this.menuModel.findById(id).populate('parent').exec();
-    if (!menu) throw new NotFoundException('Menu not found');
+    if (!menu) throw new NotFoundException(Messages.error.user.notFound(id));
+
     return menu;
   }
-async update(id: string, dto: UpdateMenuDto): Promise<Menu> {
-  return this.menuModel.findByIdAndUpdate(id, dto, { new: true });
-}
+
+  async update(id: string, dto: UpdateMenuDto): Promise<Menu> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(
+        Messages.error.validation.invalidFormat('menu ID'),
+      );
+    }
+
+    const updatedMenu = await this.menuModel
+      .findByIdAndUpdate(id, dto, { new: true })
+      .exec();
+    if (!updatedMenu)
+      throw new NotFoundException(Messages.error.user.notFound(id));
+
+    return updatedMenu;
+  }
 
   async delete(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(
+        Messages.error.validation.invalidFormat('menu ID'),
+      );
+    }
+
     const result = await this.menuModel.deleteOne({ _id: id }).exec();
-    if (result.deletedCount === 0) throw new NotFoundException('Menu not found');
+    if (result.deletedCount === 0)
+      throw new NotFoundException(Messages.error.user.notFound(id));
   }
 }

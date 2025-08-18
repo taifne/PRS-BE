@@ -30,25 +30,26 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
-import { Paginated } from 'src/common/types/pagination.type';
 import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/response/create-user-response';
+import { UserResponseDto } from './dto/responses/create-user-response';
 import { CommonResponseDto } from 'src/common/dto/common-response.dto';
-import { Messages } from 'src/common/message/tem';
+import { Messages } from 'src/common/message/messages';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { RolesList } from 'src/common/types/role';
-
-@ApiTags('users')
+import { ROUTES } from 'src/common/constants/routes.constant';
+import { AuditGuard } from '../auth/guards/audit.guard';
+@ApiTags('Administration / User')
+@Controller()
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('users')
+@UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
+@Controller(ROUTES.ADMINISTRATION.USER)
+@Roles(RolesList.ADMIN)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('search')
-  @Roles(RolesList.ADMIN)
   @ApiOkResponse({ type: ApiPaginatedResponse(User) })
   async searchUsers(
     @Query() filters: SearchUserDto,
@@ -65,6 +66,7 @@ export class UserController {
   }
 
   @Post()
+  @Roles(RolesList.USER)
   @ApiCreatedResponse({ type: CommonResponseDto })
   async create(
     @Body() createUserDto: CreateUserDto,
@@ -79,6 +81,7 @@ export class UserController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get all User' })
   @ApiOkResponse({ type: CommonResponseDto })
   async findAll(): Promise<CommonResponseDto<UserResponseDto[]>> {
     const users = await this.userService.findAll();
@@ -86,11 +89,10 @@ export class UserController {
       excludeExtraneousValues: true,
     });
 
-  return CommonResponseDto.ok(
-  dto,
-  Messages.success.user.listFetched(dto.length),
-);
-
+    return CommonResponseDto.ok(
+      dto,
+      Messages.success.user.listFetched(dto.length),
+    );
   }
 
   @Get(':id')
@@ -104,27 +106,24 @@ export class UserController {
     description: 'User not found',
     type: CommonResponseDto,
   })
- async findOne(
-  @Param('id') id: string,
-): Promise<CommonResponseDto<UserResponseDto>> {
-  const user = await this.userService.findOne(id);
+  async findOne(
+    @Param('id') id: string,
+  ): Promise<CommonResponseDto<UserResponseDto>> {
+    const user = await this.userService.findOne(id);
 
-  if (!user) {
-    return CommonResponseDto.fail(
-      Messages.error.user.notFound(id)
+    if (!user) {
+      return CommonResponseDto.fail(Messages.error.user.notFound(id));
+    }
+
+    const userDto = plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
+
+    return CommonResponseDto.ok(
+      userDto,
+      Messages.success.user.fetched(user.username),
     );
   }
-
-  const userDto = plainToInstance(UserResponseDto, user, {
-    excludeExtraneousValues: true,
-  });
-
-  return CommonResponseDto.ok(
-    userDto,
-    Messages.success.user.fetched(user.username)
-  );
-}
-
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a user by ID' })
@@ -145,26 +144,25 @@ export class UserController {
     description: 'User not found',
     type: CommonResponseDto,
   })
-async update(
-  @Param('id') id: string,
-  @Body() updateUserDto: UpdateUserDto,
-): Promise<CommonResponseDto<UserResponseDto>> {
-  const updatedUser = await this.userService.update(id, updateUserDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<CommonResponseDto<UserResponseDto>> {
+    const updatedUser = await this.userService.update(id, updateUserDto);
 
-  if (!updatedUser) {
-    return CommonResponseDto.fail(Messages.error.user.notFound(id));
+    if (!updatedUser) {
+      return CommonResponseDto.fail(Messages.error.user.notFound(id));
+    }
+
+    const userDto = plainToInstance(UserResponseDto, updatedUser, {
+      excludeExtraneousValues: true,
+    });
+
+    return CommonResponseDto.ok(
+      userDto,
+      Messages.success.user.updated(userDto.username),
+    );
   }
-
-  const userDto = plainToInstance(UserResponseDto, updatedUser, {
-    excludeExtraneousValues: true,
-  });
-
-  return CommonResponseDto.ok(
-    userDto,
-    Messages.success.user.updated(userDto.username),
-  );
-}
-
 
   @Delete('bulk')
   @ApiOperation({ summary: 'Delete multiple users by IDs' })

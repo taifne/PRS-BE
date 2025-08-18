@@ -10,10 +10,10 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    ConfigModule, // ✅ Import ConfigModule
+    ConfigModule, 
     UserModule,
     PassportModule,
-    JwtModule.registerAsync({ // ✅ Use registerAsync for dynamic secret loading
+    JwtModule.registerAsync({ 
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({

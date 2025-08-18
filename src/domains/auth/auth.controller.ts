@@ -15,7 +15,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Messages } from 'src/common/message/tem';
+import { Messages } from 'src/common/message/messages';
 
 @ApiTags('Authentication')
 @Controller('auth')

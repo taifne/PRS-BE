@@ -9,7 +9,7 @@ import { User, UserDocument } from './user.schema';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { PunchService } from '../user copy/punch.service';
 import { SearchUserDto } from './dto/search.dto';
-import { Messages } from 'src/common/message/tem';
+import { Messages } from 'src/common/message/messages';
 import { Role, RoleDocument } from '../role/role.schema';
 
 @Injectable()
@@ -20,7 +20,8 @@ export class UserService {
     private readonly punchService: PunchService,
   ) {}
   async getRoleNameById(roleId: string | Types.ObjectId): Promise<string> {
-    const role = await this.roleModel.findById(roleId).exec();
+    const role = await this.roleModel.findById(new Types.ObjectId(roleId))
+    console.log("role",role)
     if (!role) {
       throw new Error('Role not found');
     }

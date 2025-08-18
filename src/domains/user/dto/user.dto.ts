@@ -73,13 +73,13 @@ export class CreateUserDto {
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({
-    example: '64e23f1c8d3b2a5f9a87c124',
-    description: 'User ID who created this record',
-  })
-  @IsOptional()
-  @IsMongoId()
-  createdBy?: string;
+  // @ApiPropertyOptional({
+  //   example: '64e23f1c8d3b2a5f9a87c124',
+  //   description: 'User ID who created this record',
+  // })
+  // @IsOptional()
+  // @IsMongoId()
+  // createdBy?: string;
 }
 
 export class UpdateUserDto {

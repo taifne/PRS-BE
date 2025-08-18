@@ -6,6 +6,7 @@ import { User, UserSchema } from './user.schema';
 import { PunchService } from '../user copy/punch.service';
 import { Punch, PunchSchema } from '../user copy/punch.schema';
 import { Role, RoleSchema } from '../role/role.schema';
+import { ROUTES } from 'src/common/constants/routes.constant';
 
 @Module({
   imports: [
@@ -19,4 +20,6 @@ import { Role, RoleSchema } from '../role/role.schema';
   controllers: [UserController],
   exports: [UserService],
 })
-export class UserModule {}
+export class UserModule {
+  
+}
