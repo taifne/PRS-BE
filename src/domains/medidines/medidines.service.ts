@@ -22,7 +22,6 @@ export class MedicineService {
   }
 
   async update(id: string, updateMedicineDto: UpdateMedicineDto): Promise<Medicine> {
-    console.log(id,"hehe");
     return this.medicineModel.findByIdAndUpdate(id, updateMedicineDto, { new: true }).exec();
   }
 

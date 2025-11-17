@@ -19,17 +19,26 @@ export class UserService {
     @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
     private readonly punchService: PunchService,
   ) {}
-  async getRoleNameById(roleId: string | Types.ObjectId): Promise<string> {
-    const role = await this.roleModel.findById(new Types.ObjectId(roleId))
-    console.log("role",role)
-    if (!role) {
-      throw new Error('Role not found');
-    }
-    return role.name;
-  }
+  async getRoleNamesByIds(
+    roleIds: (string | Types.ObjectId)[],
+  ): Promise<string[]> {
+    // Normalize all IDs into ObjectIdconsole.log("asd",objectIds)
+    console.log("asd")
+    const objectIds = roleIds.map((id) => new Types.ObjectId(id));
 
+    // Query all roles in one go
+    const roles = await this.roleModel.find({ _id: { $in: objectIds } }).exec();
+
+    if (!roles || roles.length === 0) {
+      throw new Error('No roles found');
+    }
+
+    // Return only the role names
+    return roles.map((role) => role.name);
+  }
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).exec(); // `lean()` removes Mongoose document wrapper
+    let something = await this.userModel.findOne({ email }).exec();
+    return something; // `lean()` removes Mongoose document wrapper
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

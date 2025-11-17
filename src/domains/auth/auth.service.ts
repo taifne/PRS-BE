@@ -27,16 +27,14 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
-
     const roleName =
-      typeof user.role === 'string'
-        ? await this.userService.getRoleNameById(user.role)
-        : user.role.name;
-
+      typeof user.roles === 'string'
+        ? await this.userService.getRoleNamesByIds(user.role)
+        : user.roles.name;
     const payload = {
       sub: user._id,
       email: user.email,
-      role: roleName,
+      role:roleName,
       userName: user.username,
     };
     return {

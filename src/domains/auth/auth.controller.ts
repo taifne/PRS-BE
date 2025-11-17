@@ -16,9 +16,10 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 
 import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Messages } from 'src/common/message/messages';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller('')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -33,7 +34,7 @@ export class AuthController {
       message: Messages.success.user.created(user.username),
     };
   }
-
+  @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
@@ -41,6 +42,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
   async login(@Body() loginDto: LoginDto) {
+  
     const token = await this.authService.login(loginDto);
     return {
       data: token,
