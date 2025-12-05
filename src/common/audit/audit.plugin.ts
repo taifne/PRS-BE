@@ -9,7 +9,6 @@ export function auditPlugin(schema: Schema) {
     const now = new Date();
 
     if (this.isNew) {
-        console.log("userId",userId)
       if (userId && !this.get('createdBy')) {
         this.set('createdBy', userId);
       }

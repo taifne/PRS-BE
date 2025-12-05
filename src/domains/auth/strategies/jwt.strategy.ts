@@ -19,10 +19,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 async validate(payload: any) {
   return {
-    _id: payload.sub,         // MongoDB _id
+    _id: payload.sub,         
     email: payload.email,
     role: payload.role,
-    username: payload.userName, // match what you signed in payload
+    username: payload.userName, 
   };
 }
 

@@ -19,7 +19,6 @@ export class AuditInterceptor implements NestInterceptor {
       ip: req.ip,
       headers: req.headers,
     };
-
     return from(
       new Promise((resolve) => {
         auditContext.run(ctx, () => {

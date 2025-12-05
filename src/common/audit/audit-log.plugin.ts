@@ -11,7 +11,6 @@ export function auditLogPlugin(schema: Schema, options?: { collection?: string }
 const AuditLogModel = (doc.constructor as Model<any>).db.model('AuditLog');
     const userId = currentUserId();
     const username = currentUsername();
-console.log("doc",doc)
     await AuditLogModel.create({
       userId,
       username,

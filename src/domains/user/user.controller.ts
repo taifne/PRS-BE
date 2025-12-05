@@ -43,9 +43,8 @@ import { AuditGuard } from '../auth/guards/audit.guard';
 @ApiTags('Administration / User')
 @Controller()
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
+// @UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
 @Controller(ROUTES.ADMINISTRATION.USER)
-@Roles(RolesList.ADMIN)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
