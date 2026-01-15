@@ -1,115 +1,70 @@
 import {
-  BadRequestException,
   Injectable,
+  BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+
+import { BaseService } from 'src/common/base/base.service';
 import { User, UserDocument } from './user.schema';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { PunchService } from '../user copy/punch.service';
-import { SearchUserDto } from './dto/search.dto';
-import { Messages } from 'src/common/message/messages';
 import { Role, RoleDocument } from '../role/role.schema';
 
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
+import { PunchService } from '../user copy/punch.service';
+import { Messages } from 'src/common/message/messages';
+import { UserWithRoles } from './interfaces/user-with-roles.interface';
+
 @Injectable()
-export class UserService {
+export class UserService extends BaseService<UserDocument> {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Role.name) private roleModel: Model<RoleDocument>,
+    @InjectModel(User.name) userModel: Model<UserDocument>,
+    @InjectModel(Role.name) private readonly roleModel: Model<RoleDocument>,
     private readonly punchService: PunchService,
-  ) {}
+  ) {
+    super(userModel);
+  }
+
+  async findByEmail(email: string): Promise<UserWithRoles | null> {
+    return this.model
+      .findOne({ email })
+      .populate('roles', 'name')
+      .lean<UserWithRoles>()
+      .exec();
+  }
+
+  async findAll(): Promise<UserDocument[]> {
+    return super.findAll({
+      path: 'role',
+      select: 'name',
+    });
+  }
+
   async getRoleNamesByIds(
     roleIds: (string | Types.ObjectId)[],
   ): Promise<string[]> {
-    // Normalize all IDs into ObjectIdconsole.log("asd",objectIds)
-    console.log("asd")
-    const objectIds = roleIds.map((id) => new Types.ObjectId(id));
+    const objectIds = roleIds
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
 
-    // Query all roles in one go
-    const roles = await this.roleModel.find({ _id: { $in: objectIds } }).exec();
+    const roles = await this.roleModel.find({
+      _id: { $in: objectIds },
+    });
 
-    if (!roles || roles.length === 0) {
-      throw new Error('No roles found');
+    if (!roles.length) {
+      throw new NotFoundException('No roles found');
     }
 
-    // Return only the role names
     return roles.map((role) => role.name);
   }
-  async findByEmail(email: string): Promise<User | null> {
-    let something = await this.userModel.findOne({ email }).exec();
-    return something; // `lean()` removes Mongoose document wrapper
-  }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = new this.userModel(createUserDto);
-    const savedUser = await user.save();
-
-    // Automatically create punch record for today (or initial punch)
-    // await this.punchService.generatePunchesForUser(savedUser._id.toString());
-
-    return savedUser;
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel
-      .find()
-      .populate({
-        path: 'role',
-        select: 'name',
-      })
-      .exec();
-  }
-
-  async findOne(id: string): Promise<User> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(
-        Messages.error.validation.invalidFormat('user ID'),
-      );
-    }
-
-    const user = await this.userModel.findById(id).exec();
-    if (!user) throw new NotFoundException(Messages.error.user.notFound(id));
-
-    return user;
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    // Validate ObjectId first
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(Messages.error.user.notFound(id));
-    }
-
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
-
-    if (!updatedUser) {
-      throw new NotFoundException(Messages.error.user.notFound(id));
-    }
-
-    return updatedUser;
-  }
-
-  async delete(id: string): Promise<User> {
-    const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
-
-    if (!deletedUser) {
-      throw new NotFoundException(Messages.error.user.notFound(id));
-    }
-
-    return deletedUser;
-  }
-
-  async updateRole(userId: string, roleId: string): Promise<User> {
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new NotFoundException(Messages.error.user.notFound(userId));
-    }
+  async updateRole(userId: string, roleId: string): Promise<UserDocument> {
     if (!Types.ObjectId.isValid(roleId)) {
       throw new NotFoundException(Messages.error.user.roleNotFound(roleId));
     }
 
-    const updatedUser = await this.userModel
+    const updatedUser = await this.model
       .findByIdAndUpdate(userId, { role: roleId }, { new: true })
       .populate('role')
       .exec();
@@ -120,6 +75,7 @@ export class UserService {
 
     return updatedUser;
   }
+
   async searchUsers(filters: SearchUserDto) {
     const {
       username,
@@ -140,38 +96,34 @@ export class UserService {
       query.address = { $regex: address.trim(), $options: 'i' };
     if (phone?.trim()) query.phone = { $regex: phone.trim(), $options: 'i' };
     if (role?.trim()) {
-      if (!Types.ObjectId.isValid(role)) throw new Error('Invalid role id');
+      if (!Types.ObjectId.isValid(role)) {
+        throw new BadRequestException('Invalid role id');
+      }
       query.role = role;
     }
 
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      this.userModel
-        .find(query)
-        // .select('username displayName email phone role')
-        .populate('role')
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      this.userModel.countDocuments(query),
+      this.model.find(query).populate('role').skip(skip).limit(limit),
+      this.model.countDocuments(query),
     ]);
 
     return { data, total, page, limit };
   }
 
   async deleteUsersByIds(userIds: string[]): Promise<void> {
-    const validIds = userIds.filter((id) => Types.ObjectId.isValid(id));
+    const validIds = userIds.filter(Types.ObjectId.isValid);
 
-    if (validIds.length === 0) {
+    if (!validIds.length) {
       throw new NotFoundException(Messages.error.user.invalidIds);
     }
 
-    const result = await this.userModel.deleteMany({
+    const result = await this.model.deleteMany({
       _id: { $in: validIds },
     });
 
-    if (result.deletedCount === 0) {
+    if (!result.deletedCount) {
       throw new NotFoundException(Messages.error.user.notFound('given IDs'));
     }
   }

@@ -2,7 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from './dtos/login.dto';
+import { LoginDto } from './dto/login-request.dto';
+import { JwtUser } from './interfaces/jwt-user.interface';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { RegisterDto } from './dto/register.dto';
+import { UserDocument } from '../user/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -21,33 +25,53 @@ export class AuthService {
     return null;
   }
 
-  async login({ email, password }: LoginDto) {
+  async login({
+    email,
+    password,
+    rememberMe,
+  }: LoginDto): Promise<LoginResponseDto> {
     const user = await this.validateUser(email, password);
 
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
+
     const roleName =
       typeof user.roles === 'string'
         ? await this.userService.getRoleNamesByIds(user.role)
         : user.roles.name;
-    const payload = {
+
+    const payload: JwtUser = {
       sub: user._id,
       email: user.email,
-      role:roleName,
+      role: roleName,
       userName: user.username,
     };
+
+    const expiresIn = rememberMe
+      ? 60 * 60 * 24 * 30 // 30 days
+      : 60 * 60; // 1 hour
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn });
+
     return {
-      access_token: this.jwtService.sign(payload),
-      userRole: roleName,
-      userId: user._id,
+      accessToken,
+      tokenType: 'Bearer',
+      expiresIn,
+      user: {
+        id: user._id,
+        email: user.email,
+        userName: user.username,
+        role: roleName,
+      },
     };
   }
 
-  async register(createUserDto: any) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+  async register(registerDto: RegisterDto): Promise<UserDocument> {
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
     return this.userService.create({
-      ...createUserDto,
+      ...registerDto,
       password: hashedPassword,
     });
   }

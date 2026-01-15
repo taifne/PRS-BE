@@ -1,10 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export interface RequestContext {
-  user?: any;       // current logged-in user
-  ip?: string;      // client IP
-  headers?: any;    // request headers
-  rawRequest?: any; // original request if needed
+  user?: any;
+  ip?: string;
+  headers?: any;
+  rawRequest?: any;
 }
 
 export const RequestContext = createParamDecorator(

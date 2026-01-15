@@ -26,13 +26,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       if (typeof res === 'string') {
         message = res;
       } else if (typeof res === 'object') {
-        // NestJS usually puts `message` inside response body (can be string | string[])
         message = (res as any).message || message;
         error = (res as any).error || null;
       }
     } else if (exception instanceof Error) {
       message = exception.message;
-      error = process.env.NODE_ENV === 'production' ? undefined : exception.stack;
+      error =
+        process.env.NODE_ENV === 'production' ? undefined : exception.stack;
     }
 
     const responseBody: CommonResponseDto<any> = {

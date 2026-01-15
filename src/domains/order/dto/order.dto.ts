@@ -49,12 +49,12 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   items: CreateOrderItemDto[];
-    @IsString()
+  @IsString()
   @IsNotEmpty()
   createdBy: string;
 }
 export class UpdateOrderStatusDto {
   @IsString()
-  @IsIn(['confirmed']) // Optional strictness, can extend later
+  @IsIn(['confirmed'])
   status: string;
 }

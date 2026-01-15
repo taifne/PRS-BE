@@ -17,7 +17,7 @@ import {
   UpdateUserRoleDto,
 } from './dto/user.dto';
 import { User } from './user.schema';
-import { SearchUserDto } from './dto/search.dto';
+import { SearchUserDto } from './dto/search-user.dto';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -31,7 +31,7 @@ import {
 } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
 import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/responses/create-user-response';
+import { UserResponseDto } from './dto/create-user-response.dto';
 import { CommonResponseDto } from 'src/common/dto/common-response.dto';
 import { Messages } from 'src/common/message/messages';
 import { Roles } from '../auth/decorators/roles.decorator';

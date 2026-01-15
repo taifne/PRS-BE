@@ -12,19 +12,19 @@ export class AuditLog {
   username?: string;
 
   @Prop({ type: String })
-  collection: string; // e.g., "roles", "users"
+  collection: string;
 
   @Prop({ type: Types.ObjectId })
-  documentId: Types.ObjectId; // affected document _id
+  documentId: Types.ObjectId;
 
   @Prop()
   action: 'create' | 'update' | 'delete';
 
   @Prop({ type: Object })
-  before?: Record<string, any>; // old values
+  before?: Record<string, any>;
 
   @Prop({ type: Object })
-  after?: Record<string, any>; // new values
+  after?: Record<string, any>;
 }
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
