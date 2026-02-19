@@ -6,7 +6,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-import { BaseService } from 'src/common/base/base.service';
+import { BaseService } from 'src/common/base';
+
 import { User, UserDocument } from './user.schema';
 import { Role, RoleDocument } from '../role/role.schema';
 
