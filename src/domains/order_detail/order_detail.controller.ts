@@ -21,7 +21,7 @@ export class OrderDetailController {
   findOne(@Param('id') id: string) {
     return this.orderDetailService.findById(id);
   }
-    @Delete(':orderKey/:orderDetailId')
+  @Delete(':orderKey/:orderDetailId')
   async removeOrderDetail(
     @Param('orderKey') orderKey: string,
     @Param('orderDetailId') orderDetailId: string,

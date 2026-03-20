@@ -7,7 +7,9 @@ import { PunchController } from './punch.controller';
 import { Punch, PunchSchema } from './punch.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Punch.name, schema: PunchSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: Punch.name, schema: PunchSchema }]),
+  ],
   controllers: [PunchController],
   providers: [PunchService],
 })

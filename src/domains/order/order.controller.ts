@@ -1,5 +1,13 @@
 // src/orders/order.controller.ts
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
 
@@ -8,10 +16,9 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
   @Get('reports/medicine-sales/:month') // e.g., /orders/reports/medicine-sales/2025-06
   async getMedicineSalesInMonth(@Param('month') month: string) {
-
     return this.orderService.getTopMedicinesByMonth(month);
   }
- @Patch(':orderKey/status')
+  @Patch(':orderKey/status')
   async updateStatus(
     @Param('orderKey') orderKey: string,
     @Body() dto: UpdateOrderStatusDto,
@@ -48,19 +55,19 @@ export class OrderController {
     return this.orderService.getOrderDetailsByOrderKey(orderKey);
   }
   @Get('reports/revenue/:year')
-getRevenue(@Param('year') year: string) {
-  return this.orderService.getMonthlyRevenue(Number(year));
-}
+  getRevenue(@Param('year') year: string) {
+    return this.orderService.getMonthlyRevenue(Number(year));
+  }
 
-@Get('reports/top-medicines/monthly/:year')
-async getTopMonthly(@Param('year') year: string) {
-  let hihi = await this.orderService.getTopMedicines(Number(year));
+  @Get('reports/top-medicines/monthly/:year')
+  async getTopMonthly(@Param('year') year: string) {
+    const hihi = await this.orderService.getTopMedicines(Number(year));
 
-  return this.orderService.getTopMedicines(Number(year));
-}
+    return this.orderService.getTopMedicines(Number(year));
+  }
 
-@Get('reports/top-medicines/yearly/:year')
-getTopYearly(@Param('year') year: string) {
-  return this.orderService.getTopMedicinesPerYear(Number(year));
-}
+  @Get('reports/top-medicines/yearly/:year')
+  getTopYearly(@Param('year') year: string) {
+    return this.orderService.getTopMedicinesPerYear(Number(year));
+  }
 }

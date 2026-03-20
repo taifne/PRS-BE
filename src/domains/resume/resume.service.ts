@@ -7,10 +7,14 @@ import { Resume, ResumeDocument } from './resume.schema';
 @Injectable()
 export class ResumeService {
   constructor(
-    @InjectModel(Resume.name) private readonly resumeModel: Model<ResumeDocument>,
+    @InjectModel(Resume.name)
+    private readonly resumeModel: Model<ResumeDocument>,
   ) {}
 
-  async create(userId: Types.ObjectId, createResumeDto: CreateResumeDto): Promise<Resume> {
+  async create(
+    userId: Types.ObjectId,
+    createResumeDto: CreateResumeDto,
+  ): Promise<Resume> {
     const created = new this.resumeModel({
       ...createResumeDto,
       user: userId,
@@ -18,10 +22,9 @@ export class ResumeService {
     return created.save();
   }
 
-async findAllByUser(userId: string) {
-  return this.resumeModel.find({ user: userId }).exec();
-}
-
+  async findAllByUser(userId: string) {
+    return this.resumeModel.find({ user: userId }).exec();
+  }
 
   async findById(userId: Types.ObjectId, id: string): Promise<Resume> {
     const resume = await this.resumeModel
@@ -41,11 +44,9 @@ async findAllByUser(userId: string) {
     updateResumeDto: UpdateResumeDto,
   ): Promise<Resume> {
     const updated = await this.resumeModel
-      .findOneAndUpdate(
-        { _id: id, user: userId },
-        updateResumeDto,
-        { new: true },
-      )
+      .findOneAndUpdate({ _id: id, user: userId }, updateResumeDto, {
+        new: true,
+      })
       .exec();
 
     if (!updated) {

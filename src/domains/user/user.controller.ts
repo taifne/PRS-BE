@@ -32,7 +32,7 @@ import {
 import { ApiPaginatedResponse } from 'src/common/decorators/api-paginated-response.decorator';
 import { plainToInstance } from 'class-transformer';
 import { UserResponseDto } from './dto/create-user-response.dto';
-import { CommonResponseDto } from 'src/common/dto/common-response.dto';
+import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
 import { Messages } from 'src/common/message/messages';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -46,7 +46,7 @@ import { AuditGuard } from '../auth/guards/audit.guard';
 // @UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
 @Controller(ROUTES.ADMINISTRATION.USER)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get('search')
   @ApiOkResponse({ type: ApiPaginatedResponse(User) })
@@ -65,8 +65,8 @@ export class UserController {
   }
 
   @Post()
-  @Roles(RolesList.USER)
-  @ApiCreatedResponse({ type: CommonResponseDto })
+  // @Roles(RolesList.USER)
+  // @ApiCreatedResponse({ type: CommonResponseDto })
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<CommonResponseDto<UserResponseDto>> {

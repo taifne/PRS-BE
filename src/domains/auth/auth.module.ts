@@ -10,10 +10,10 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    ConfigModule, 
+    ConfigModule,
     UserModule,
     PassportModule,
-    JwtModule.registerAsync({ 
+    JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -26,4 +26,4 @@ import { UserModule } from '../user/user.module';
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

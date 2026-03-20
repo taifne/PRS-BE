@@ -24,7 +24,7 @@ export const PaginatedResponse = <TModel extends Type<any>>(model: TModel) => {
     meta: MetaDto;
 
     @ApiProperty({ type: [model] })
-    items: InstanceType<TModel>[]; 
+    items: InstanceType<TModel>[];
   }
 
   return PaginatedResponseDto;

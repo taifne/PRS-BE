@@ -5,7 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { Order, OrderSchema } from './order.schema';
-import { OrderDetail, OrderDetailSchema } from '../order_detail/order_detail.schema';
+import {
+  OrderDetail,
+  OrderDetailSchema,
+} from '../order_detail/order_detail.schema';
 
 @Module({
   imports: [

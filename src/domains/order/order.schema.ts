@@ -27,7 +27,7 @@ export class Order {
 
   @Prop({ unique: true })
   orderKey: string;
-    @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   createdBy: Types.ObjectId;
 }
 
@@ -39,4 +39,3 @@ OrderSchema.pre('save', function (next) {
   }
   next();
 });
-

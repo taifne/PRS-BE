@@ -5,4 +5,4 @@ export const RolesList = {
   MANAGER: 'manager',
 } as const;
 
-export type RoleType = typeof RolesList[keyof typeof RolesList];
+export type RoleType = (typeof RolesList)[keyof typeof RolesList];

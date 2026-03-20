@@ -7,13 +7,12 @@ import { OrderDetailService } from './order_detail.service';
 import { Order, OrderSchema } from '../order/order.schema';
 import { Medicine, MedicineSchema } from '../medidines/medidines.schema';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: OrderDetail.name, schema: OrderDetailSchema },
       { name: Order.name, schema: OrderSchema },
-         { name: Medicine.name, schema: MedicineSchema},
+      { name: Medicine.name, schema: MedicineSchema },
     ]),
   ],
   providers: [OrderDetailService],

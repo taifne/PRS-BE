@@ -3,7 +3,7 @@ export const Messages = {
     user: {
       fetched: (name?: string) =>
         name
-          ? `User "${name}" fetched successfully`
+          ? `User ${name} fetched successfully`
           : 'User fetched successfully',
       listFetched: (count?: number) =>
         count
@@ -11,11 +11,11 @@ export const Messages = {
           : 'Users fetched successfully',
       created: (name?: string) =>
         name
-          ? `User "${name}" created successfully`
+          ? `User ${name} created successfully`
           : 'User created successfully',
       updated: (name?: string) =>
         name
-          ? `User "${name}" updated successfully`
+          ? `User ${name} updated successfully`
           : 'User updated successfully',
       deleted: (count?: number) =>
         count
@@ -23,17 +23,17 @@ export const Messages = {
           : 'Users deleted successfully',
       roleUpdated: (name?: string) =>
         name
-          ? `Role of user "${name}" updated successfully`
+          ? `Role of user ${name} updated successfully`
           : 'User role updated successfully',
       passwordChanged: (name?: string) =>
         name
-          ? `Password of user "${name}" changed successfully`
+          ? `Password of user ${name} changed successfully`
           : 'Password changed successfully',
     },
     role: {
       fetched: (name?: string) =>
         name
-          ? `Role "${name}" fetched successfully`
+          ? `Role ${name} fetched successfully`
           : 'Role fetched successfully',
       listFetched: (count?: number) =>
         count
@@ -41,11 +41,11 @@ export const Messages = {
           : 'Roles fetched successfully',
       created: (name?: string) =>
         name
-          ? `Role "${name}" created successfully`
+          ? `Role ${name} created successfully`
           : 'Role created successfully',
       updated: (name?: string) =>
         name
-          ? `Role "${name}" updated successfully`
+          ? `Role ${name} updated successfully`
           : 'Role updated successfully',
       deleted: (count?: number) =>
         count
@@ -53,13 +53,13 @@ export const Messages = {
           : 'Roles deleted successfully',
       menusUpdated: (name?: string) =>
         name
-          ? `Menus of role "${name}" updated successfully`
+          ? `Menus of role ${name} updated successfully`
           : 'Role menus updated successfully',
     },
     menu: {
       fetched: (name?: string) =>
         name
-          ? `Menu "${name}" fetched successfully`
+          ? `Menu ${name} fetched successfully`
           : 'Menu fetched successfully',
       listFetched: (count?: number) =>
         count
@@ -67,11 +67,11 @@ export const Messages = {
           : 'Menus fetched successfully',
       created: (name?: string) =>
         name
-          ? `Menu "${name}" created successfully`
+          ? `Menu ${name} created successfully`
           : 'Menu created successfully',
       updated: (name?: string) =>
         name
-          ? `Menu "${name}" updated successfully`
+          ? `Menu ${name} updated successfully`
           : 'Menu updated successfully',
       deleted: (count?: number) =>
         count
@@ -82,7 +82,7 @@ export const Messages = {
     auth: {
       loggedIn: (name?: string) =>
         name
-          ? `User "${name}" logged in successfully`
+          ? `User ${name} logged in successfully`
           : 'Logged in successfully',
       loggedOut: 'Logged out successfully',
       tokenRefreshed: 'Token refreshed successfully',

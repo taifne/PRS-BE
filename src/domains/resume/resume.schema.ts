@@ -208,7 +208,11 @@ export class Resume {
     relationship?: string;
   }[];
 
-  @Prop({ type: String, enum: ['private', 'public', 'linkOnly'], default: 'private' })
+  @Prop({
+    type: String,
+    enum: ['private', 'public', 'linkOnly'],
+    default: 'private',
+  })
   visibility: 'private' | 'public' | 'linkOnly';
 
   @Prop({ type: Boolean, default: false })

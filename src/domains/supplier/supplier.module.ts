@@ -6,7 +6,9 @@ import { SupplierController } from './supplier.controller';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Supplier.name, schema: SupplierSchema }]),
+    MongooseModule.forFeature([
+      { name: Supplier.name, schema: SupplierSchema },
+    ]),
   ],
   controllers: [SupplierController],
   providers: [SupplierService],

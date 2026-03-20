@@ -26,21 +26,24 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { UserProfileResponseDto } from '../user/dto/user-profile-response.dto';
-import { CommonResponseDto } from 'src/common/dto/common-response.dto';
+import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
+import { RefreshTokenDto } from './dto/refetch-token.dto';
+import { ROUTES } from 'src/common/constants/routes.constant';
 
 @ApiTags('Authentication')
 @Controller('')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Public()
-  @Post('register')
+  @Post(ROUTES.ADMINISTRATION.AUTH.REGISTER)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   async register(
     @Body() createUserDto: CreateUserDto,
   ): Promise<CommonResponseDto<RegisterResponseDto>> {
+
     const user = await this.authService.register(createUserDto);
 
     return CommonResponseDto.ok(
@@ -55,7 +58,7 @@ export class AuthController {
 
   @Public()
   @UseGuards(LocalAuthGuard)
-  @Post('login')
+  @Post(ROUTES.ADMINISTRATION.AUTH.LOGIN)
   @HttpCode(200)
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({ type: LoginDto })
@@ -75,7 +78,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get(ROUTES.ADMINISTRATION.AUTH.GETME)
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiBearerAuth()
   @ApiResponse({
@@ -87,13 +90,26 @@ export class AuthController {
     const user = req.user;
 
     return CommonResponseDto.ok(
-      {
-        id: user._id?.toString() ?? user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role?.name ?? user.role,
-      },
+      user,
       Messages.success.user.fetched(user.username),
+    );
+  }
+
+  @Public()
+  @Post(ROUTES.ADMINISTRATION.AUTH.REFRESH)
+  @ApiOperation({ summary: 'Refresh access token using refresh token' })
+  @ApiBody({ type: RefreshTokenDto })
+  @ApiOkResponse({
+    description: 'New access token issued successfully',
+  })
+  async refresh(@Body() body: RefreshTokenDto): Promise<CommonResponseDto<any>> {
+    const { refreshToken } = body;
+
+    const newToken = await this.authService.refreshToken(refreshToken);
+
+    return CommonResponseDto.ok(
+      newToken,
+      Messages.success.auth.tokenRefreshed,
     );
   }
 }

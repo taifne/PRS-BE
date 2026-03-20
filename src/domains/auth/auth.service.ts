@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -13,16 +17,45 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { _id, email, roles, username } = user;
-      return { _id: _id.toString(), email, roles, username };
+
+  /**
+    * Validate user credentials
+    * @param email User email
+    * @param password Plain text password
+    * @returns user info if valid, throws otherwise
+    */
+  async validateUser(email: string, password: string): Promise<{
+    _id: string;
+    email: string;
+    username: string;
+    roles: any[];
+  }> {
+    // Find user by email and populate roles
+    const user = await this.userService.findOneByOrThrow<UserDocument>(
+      { email },
+      {
+        lean: true, // return plain object (faster)
+        populate: { path: 'roles', select: 'name' }, // populate roles
+        message: 'User not found',
+      },
+    );
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid credentials');
     }
 
-    return null;
+    // Return cleaned user object (without password)
+    const { _id, username, roles } = user;
+    return {
+      _id: _id.toString(),
+      email,
+      username,
+      roles,
+    };
   }
 
   async login({
@@ -38,8 +71,8 @@ export class AuthService {
 
     const roleName =
       typeof user.roles === 'string'
-        ? await this.userService.getRoleNamesByIds(user.role)
-        : user.roles.name;
+        ? await this.userService.getRoleNamesByIds(user.roles)
+        : user.roles;
 
     const payload: JwtUser = {
       sub: user._id,
@@ -69,10 +102,42 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<UserDocument> {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const usernameExists = await this.userService.exists({
+      username: registerDto.username,
+      email: registerDto.email
+    });
 
+    if (usernameExists) {
+      throw new BadRequestException('Username already exists !!');
+    }
     return this.userService.create({
       ...registerDto,
       password: hashedPassword,
     });
+  }
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+
+      // Optional: check hashed refresh token in DB for extra security
+      const user = await this.userService.findOneByOrThrow(
+        { _id: payload.sub },
+        { lean: true },
+      );
+
+      const newAccessToken = this.jwtService.sign(
+        {
+          sub: user._id.toString(),
+          email: user.email,
+          role: payload.role,
+          userName: user.username,
+        },
+        { expiresIn: 60 * 60 }, // 1 hour
+      );
+
+      return { accessToken: newAccessToken, expiresIn: 60 * 60 };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 }

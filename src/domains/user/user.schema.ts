@@ -1,9 +1,9 @@
-
 import { Document, Types } from 'mongoose';
-import { Role } from '../role/role.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { BaseEntity, BaseEntitySchema } from 'src/common/schemas/base-entity.schema';
-import { addAuditQueryHelpers } from 'src/common/audit/audit.query';
+import {
+  BaseEntity,
+  BaseEntitySchema,
+} from 'src/common/base/schemas/base-entity.schema';
 import { auditLogPlugin } from 'src/common/audit/audit-log.plugin';
 
 export type UserDocument = User & Document;
@@ -33,7 +33,7 @@ export class User extends BaseEntity {
   address: string;
 
   @Prop({ type: [Types.ObjectId], ref: 'Role', default: [] })
-  roles: Types.ObjectId[]; 
+  roles: Types.ObjectId[];
 
   @Prop({ default: true })
   isActive: boolean;

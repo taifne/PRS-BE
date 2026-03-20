@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { auditPlugin } from '../audit/audit.plugin';
-import { addAuditQueryHelpers } from '../audit/audit.query';
+import { auditPlugin } from '../../audit/audit.plugin';
+import { addAuditQueryHelpers } from '../../audit/audit.query';
 
 export type BaseEntityDocument = BaseEntity & Document;
 
 @Schema({ timestamps: true })
 export class BaseEntity {
-
   @ApiProperty({ description: 'Active flag', default: true })
   @Prop({ default: true })
   isActive: boolean;

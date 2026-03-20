@@ -5,7 +5,7 @@ import { auditLogPlugin } from 'src/common/audit/audit-log.plugin';
 import {
   BaseEntity,
   BaseEntitySchema,
-} from 'src/common/schemas/base-entity.schema';
+} from 'src/common/base/schemas/base-entity.schema';
 
 export type RoleDocument = Role & Document;
 

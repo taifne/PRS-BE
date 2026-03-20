@@ -7,7 +7,9 @@ import { MenuController } from './menu.controller';
 import { Menu, MenuSchema } from './menu.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Menu.name, schema: MenuSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: Menu.name, schema: MenuSchema }]),
+  ],
   controllers: [MenuController],
   providers: [MenuService],
   exports: [MenuService],

@@ -20,6 +20,4 @@ import { ROUTES } from 'src/common/constants/routes.constant';
   controllers: [UserController],
   exports: [UserService],
 })
-export class UserModule {
-  
-}
+export class UserModule { }

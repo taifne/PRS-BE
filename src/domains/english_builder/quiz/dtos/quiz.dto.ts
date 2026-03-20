@@ -1,5 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsIn, IsInt, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+  Max,
+} from 'class-validator';
 
 export class GenerateQuizDto {
   @ApiPropertyOptional({ type: [String], description: 'Filter by topics' })
@@ -16,7 +24,11 @@ export class GenerateQuizDto {
   @IsIn(['Beginner', 'Intermediate', 'Advanced'])
   level?: string;
 
-  @ApiProperty({ minimum: 1, maximum: 20, description: 'Number of questions to generate' })
+  @ApiProperty({
+    minimum: 1,
+    maximum: 20,
+    description: 'Number of questions to generate',
+  })
   @IsInt()
   @Min(1)
   @Max(20)
@@ -38,14 +50,16 @@ export class QuizQuestionDto {
   @ApiProperty({ description: 'Question text' })
   question: string;
 
-  @ApiProperty({ enum: [
-    'definition_mcq',
-    'word_mcq',
-    'fill_blank',
-    'synonym_mcq',
-    'antonym_mcq',
-    'example_fill',
-  ]})
+  @ApiProperty({
+    enum: [
+      'definition_mcq',
+      'word_mcq',
+      'fill_blank',
+      'synonym_mcq',
+      'antonym_mcq',
+      'example_fill',
+    ],
+  })
   type: QuestionType;
 
   @ApiPropertyOptional({ description: 'Multiple choice options' })
@@ -59,18 +73,32 @@ export class QuizQuestionDto {
 }
 
 export class GenerateSentenceQuizDto {
-  @ApiProperty({ required: false, description: 'Filter by topics', example: ['Food', 'Basic'] })
+  @ApiProperty({
+    required: false,
+    description: 'Filter by topics',
+    example: ['Food', 'Basic'],
+  })
   topics?: string[];
 
-  @ApiProperty({ required: false, description: 'Difficulty level', example: 'Beginner' })
+  @ApiProperty({
+    required: false,
+    description: 'Difficulty level',
+    example: 'Beginner',
+  })
   level?: string;
 
-  @ApiProperty({ required: false, description: 'Number of questions', example: 5 })
+  @ApiProperty({
+    required: false,
+    description: 'Number of questions',
+    example: 5,
+  })
   numQuestions?: number;
 }
 
 export class SentenceQuizQuestionDto {
-  @ApiProperty({ description: 'Sentence with missing words replaced by blanks' })
+  @ApiProperty({
+    description: 'Sentence with missing words replaced by blanks',
+  })
   maskedSentence: string;
 
   @ApiProperty({ description: 'Array of missing words (correct answers)' })

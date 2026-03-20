@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { VocabularyService } from './vocabulary.service';
 import { CreateVocabularyDto } from './dto/create-vocabulary.dto';
 import { UpdateVocabularyDto } from './dto/update-vocabulary.dto';
@@ -13,18 +22,17 @@ export class VocabularyController {
     return this.vocabularyService.create(createVocabularyDto);
   }
 
-@Get()
-findAll(@Query() query: SearchVocabularyDto) {
-  const topicsArr = query.topics ? query.topics.split(',') : undefined;
-  return this.vocabularyService.findAll({
-    search: query.search,
-    topics: topicsArr,
-    level: query.level,
-    page: query.page,
-    limit: query.limit,
-  });
-}
-
+  @Get()
+  findAll(@Query() query: SearchVocabularyDto) {
+    const topicsArr = query.topics ? query.topics.split(',') : undefined;
+    return this.vocabularyService.findAll({
+      search: query.search,
+      topics: topicsArr,
+      level: query.level,
+      page: query.page,
+      limit: query.limit,
+    });
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -32,7 +40,10 @@ findAll(@Query() query: SearchVocabularyDto) {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVocabularyDto: UpdateVocabularyDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVocabularyDto: UpdateVocabularyDto,
+  ) {
     return this.vocabularyService.update(id, updateVocabularyDto);
   }
 

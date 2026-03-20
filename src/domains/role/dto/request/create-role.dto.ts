@@ -7,7 +7,10 @@ export class CreateRoleDto {
   @IsNotEmpty()
   readonly name: string;
 
-  @ApiPropertyOptional({ description: 'Description of the role', example: 'Administrator with full access' })
+  @ApiPropertyOptional({
+    description: 'Description of the role',
+    example: 'Administrator with full access',
+  })
   @IsString()
   @IsOptional()
   readonly description?: string;

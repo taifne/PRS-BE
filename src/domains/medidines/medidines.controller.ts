@@ -1,5 +1,17 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
-import { CreateMedicineDto, UpdateMedicineDto } from './dto/create-supplier.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
+import {
+  CreateMedicineDto,
+  UpdateMedicineDto,
+} from './dto/create-supplier.dto';
 import { Medicine } from './medidines.schema';
 import { MedicineService } from './medidines.service';
 
@@ -8,7 +20,9 @@ export class MedicineController {
   constructor(private readonly medicineService: MedicineService) {}
 
   @Post()
-  async create(@Body() createMedicineDto: CreateMedicineDto): Promise<Medicine> {
+  async create(
+    @Body() createMedicineDto: CreateMedicineDto,
+  ): Promise<Medicine> {
     return this.medicineService.create(createMedicineDto);
   }
   @Get('search')
@@ -26,7 +40,10 @@ export class MedicineController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateMedicineDto: UpdateMedicineDto): Promise<Medicine> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateMedicineDto: UpdateMedicineDto,
+  ): Promise<Medicine> {
     return this.medicineService.update(id, updateMedicineDto);
   }
 

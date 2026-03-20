@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsDateString, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateMedicineDto {
   @IsNotEmpty()

@@ -9,7 +9,8 @@ import { Vocabulary, VocabularyDocument } from './vocabulary.schema';
 @Injectable()
 export class VocabularyService {
   constructor(
-    @InjectModel(Vocabulary.name) private vocabularyModel: Model<VocabularyDocument>,
+    @InjectModel(Vocabulary.name)
+    private vocabularyModel: Model<VocabularyDocument>,
   ) {}
 
   async create(createVocabularyDto: CreateVocabularyDto): Promise<Vocabulary> {
@@ -17,15 +18,13 @@ export class VocabularyService {
     return createdWord.save();
   }
 
-  async findAll(
-    filters?: {
-      topics?: string[];
-      level?: string;
-      search?: string;
-      page?: number;
-      limit?: number;
-    }
-  ): Promise<{ data: Vocabulary[]; total: number }> {
+  async findAll(filters?: {
+    topics?: string[];
+    level?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: Vocabulary[]; total: number }> {
     const query: any = {};
     if (filters?.topics?.length) query.topics = { $in: filters.topics };
     if (filters?.level) query.level = filters.level;
@@ -47,13 +46,20 @@ export class VocabularyService {
 
   async findOne(id: string): Promise<Vocabulary> {
     const word = await this.vocabularyModel.findById(id).exec();
-    if (!word) throw new NotFoundException(`Vocabulary with id ${id} not found`);
+    if (!word)
+      throw new NotFoundException(`Vocabulary with id ${id} not found`);
     return word;
   }
 
-  async update(id: string, updateDto: UpdateVocabularyDto): Promise<Vocabulary> {
-    const updatedWord = await this.vocabularyModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
-    if (!updatedWord) throw new NotFoundException(`Vocabulary with id ${id} not found`);
+  async update(
+    id: string,
+    updateDto: UpdateVocabularyDto,
+  ): Promise<Vocabulary> {
+    const updatedWord = await this.vocabularyModel
+      .findByIdAndUpdate(id, updateDto, { new: true })
+      .exec();
+    if (!updatedWord)
+      throw new NotFoundException(`Vocabulary with id ${id} not found`);
     return updatedWord;
   }
 

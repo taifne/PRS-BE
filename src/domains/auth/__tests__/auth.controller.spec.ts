@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { Messages } from 'src/common/message/messages';
-import { CommonResponseDto } from 'src/common/dto/common-response.dto';
+import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;

@@ -12,7 +12,7 @@ import { RoleService } from './role.service';
 
 import { UpdateRoleMenusDto } from './dto/request/update-menus.dto';
 import { RoleResponseDto } from './dto/response/role-response.dto';
-import { CommonResponseDto } from 'src/common/dto/common-response.dto';
+import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
 import { plainToInstance } from 'class-transformer';
 
 import {
@@ -35,9 +35,8 @@ import { CreateRoleDto } from './dto/request/create-role.dto';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
 @Controller(ROUTES.ADMINISTRATION.ROLE)
-@Roles(RolesList.ADMIN)
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) { }
 
   @Post()
   @Roles(RolesList.ADMIN, RolesList.USER)
@@ -45,7 +44,8 @@ export class RoleController {
   async create(
     @Body() createRoleDto: CreateRoleDto,
   ): Promise<CommonResponseDto<RoleResponseDto>> {
-    const role = await this.roleService.create(createRoleDto);
+
+    const role = await this.roleService.createRole(createRoleDto);
     const dto = plainToInstance(RoleResponseDto, role, {
       excludeExtraneousValues: true,
     });

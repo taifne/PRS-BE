@@ -22,26 +22,19 @@ export class ResumeController {
   constructor(private readonly resumeService: ResumeService) {}
 
   @Post()
-  async create(
-    @Req() req: Request,
-    @Body() createResumeDto: CreateResumeDto,
-  ) {
+  async create(@Req() req: Request, @Body() createResumeDto: CreateResumeDto) {
     const userId = req.user['userId'] as Types.ObjectId;
     return this.resumeService.create(userId, createResumeDto);
   }
 
-@Get()
-async findAll(@Query('userId') userId: string) {
-  if (!userId) throw new BadRequestException('Missing userId');
-  return this.resumeService.findAllByUser(userId);
-}
-
+  @Get()
+  async findAll(@Query('userId') userId: string) {
+    if (!userId) throw new BadRequestException('Missing userId');
+    return this.resumeService.findAllByUser(userId);
+  }
 
   @Get(':id')
-  async findById(
-    @Req() req: Request,
-    @Param('id') id: string,
-  ) {
+  async findById(@Req() req: Request, @Param('id') id: string) {
     const userId = req.user['userId'] as Types.ObjectId;
     return this.resumeService.findById(userId, id);
   }
@@ -57,10 +50,7 @@ async findAll(@Query('userId') userId: string) {
   }
 
   @Delete(':id')
-  async delete(
-    @Req() req: Request,
-    @Param('id') id: string,
-  ) {
+  async delete(@Req() req: Request, @Param('id') id: string) {
     const userId = req.user['userId'] as Types.ObjectId;
     return this.resumeService.delete(userId, id);
   }

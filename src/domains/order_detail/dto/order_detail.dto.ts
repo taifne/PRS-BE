@@ -2,9 +2,8 @@
 import { IsMongoId, IsNumber, IsString } from 'class-validator';
 
 export class CreateOrderDetailDto {
-
   @IsString()
-  orderKey:string;
+  orderKey: string;
   @IsMongoId()
   medicine: string;
 

@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsArray, IsIn, IsInt, Min } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsArray,
+  IsIn,
+  IsInt,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchVocabularyDto {
@@ -8,7 +15,7 @@ export class SearchVocabularyDto {
 
   @IsOptional()
   @IsString()
-  topics?: string; 
+  topics?: string;
 
   @IsOptional()
   @IsIn(['Beginner', 'Intermediate', 'Advanced'])

@@ -15,7 +15,7 @@ import { PunchModule } from './domains/user copy/punch.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ResumeModule } from './domains/resume/resume.module';
 import { VocabularyModule } from './domains/vocabulary/vocabulary.module';
-import { QuizModule } from './domains/EnglishBuilder/quiz/quiz.module';
+import { QuizModule } from './domains/english_builder/quiz/quiz.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { APP_GUARD, RouterModule } from '@nestjs/core';
@@ -33,7 +33,7 @@ import { RolesGuard } from './domains/auth/guards/roles.guard';
 
     MongooseModule.forRoot(
       process.env.MONGODB_URI ||
-        'mongodb+srv://thaitai:thaitai123@medi.28aks.mongodb.net/yourDB?retryWrites=true&w=majority',
+      'mongodb://admin:123456@localhost:27017/yourDB?authSource=admin',
     ),
 
     DevtoolsModule.register({
@@ -58,7 +58,7 @@ import { RolesGuard } from './domains/auth/guards/roles.guard';
         path: ROUTES.ADMINISTRATION.ROOT,
         children: [
           { path: ROUTES.ADMINISTRATION.USER, module: UserModule },
-          { path: ROUTES.ADMINISTRATION.AUTH, module: AuthModule },
+          { path: ROUTES.ADMINISTRATION.AUTH.ROOT, module: AuthModule },
           { path: ROUTES.ADMINISTRATION.ROLE, module: RoleModule },
           { path: ROUTES.ADMINISTRATION.MENU, module: MenuModule },
         ],
@@ -97,4 +97,4 @@ import { RolesGuard } from './domains/auth/guards/roles.guard';
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -6,7 +6,9 @@ import { Vocabulary, VocabularySchema } from './vocabulary.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Vocabulary.name, schema: VocabularySchema }]),
+    MongooseModule.forFeature([
+      { name: Vocabulary.name, schema: VocabularySchema },
+    ]),
   ],
   controllers: [VocabularyController],
   providers: [VocabularyService],

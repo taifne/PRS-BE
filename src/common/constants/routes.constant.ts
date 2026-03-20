@@ -2,7 +2,13 @@ export const ROUTES = {
   ADMINISTRATION: {
     ROOT: 'administration',
     USER: 'users',
-    AUTH: 'auth',
+    AUTH: {
+      ROOT: 'auth',
+      LOGIN: 'login',
+      REGISTER: 'register',
+      REFRESH: 'refresh',
+      GETME: 'getme'
+    },
     ROLE: 'roles',
     MENU: 'menus',
   },
@@ -14,13 +20,21 @@ export const ROUTES = {
     ORDER: 'orders',
     ORDER_DETAIL: 'order-details',
   },
+  COBALLATIVETEXT: {
+    ROOT: 'inventory',
+    DOCUMENT: 'document',
+    DOCUMENTVERSION: 'document-version',
+    CATEGORY: 'categories',
+    ORDER: 'orders',
+    ORDER_DETAIL: 'order-details',
+  },
   HR: {
-     ROOT: 'hr',
+    ROOT: 'hr',
     PUNCH: 'punches',
   },
   RESUME: {
     ROOT: 'resume',
-     RESUME: 'template',
+    RESUME: 'template',
   },
   EDUCATION: {
     ROOT: 'el-builder',

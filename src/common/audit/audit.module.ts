@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuditViewerService } from './audit-viewer.service';
 import { AuditController } from './audit.controller';
-import { AuditLog, AuditLogSchema } from '../schemas/audit-log.schema';
+import { AuditLog, AuditLogSchema } from '../base/schemas/audit-log.schema';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { AuditLog, AuditLogSchema } from '../schemas/audit-log.schema';
     ]),
   ],
   providers: [AuditViewerService],
-  controllers: [AuditController],  
+  controllers: [AuditController],
   exports: [AuditViewerService],
 })
-export class AuditModule {}
+export class AuditModule { }

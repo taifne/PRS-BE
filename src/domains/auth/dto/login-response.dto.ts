@@ -24,7 +24,7 @@ export class LoginUserDto {
     description: 'User role',
     example: 'ADMIN',
   })
-  role: string;
+  role: any[];
 }
 
 export class LoginResponseDto {
