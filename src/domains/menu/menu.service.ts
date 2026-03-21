@@ -8,11 +8,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { Menu, MenuDocument } from './menu.schema';
-import { Messages } from 'src/common/message/messages';
+import { DatabaseMessages, MenuMessages, ValidationMessages } from 'src/common/messages';
 
 @Injectable()
 export class MenuService {
-  constructor(@InjectModel(Menu.name) private menuModel: Model<MenuDocument>) {}
+  constructor(@InjectModel(Menu.name) private menuModel: Model<MenuDocument>) { }
 
   async create(dto: CreateMenuDto): Promise<Menu> {
     const menu = new this.menuModel(dto);
@@ -26,12 +26,12 @@ export class MenuService {
   async findOne(id: string): Promise<Menu> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(
-        Messages.error.validation.invalidFormat('menu ID'),
+        ValidationMessages.invalid('menu ID'),
       );
     }
 
     const menu = await this.menuModel.findById(id).populate('parent').exec();
-    if (!menu) throw new NotFoundException(Messages.error.user.notFound(id));
+    if (!menu) throw new NotFoundException(DatabaseMessages.notFound(id));
 
     return menu;
   }
@@ -39,7 +39,7 @@ export class MenuService {
   async update(id: string, dto: UpdateMenuDto): Promise<Menu> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(
-        Messages.error.validation.invalidFormat('menu ID'),
+        ValidationMessages.invalidFormat('menu ID'),
       );
     }
 
@@ -47,7 +47,7 @@ export class MenuService {
       .findByIdAndUpdate(id, dto, { new: true })
       .exec();
     if (!updatedMenu)
-      throw new NotFoundException(Messages.error.user.notFound(id));
+      throw new NotFoundException(DatabaseMessages.notFound(id));
 
     return updatedMenu;
   }
@@ -55,12 +55,12 @@ export class MenuService {
   async delete(id: string): Promise<void> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException(
-        Messages.error.validation.invalidFormat('menu ID'),
+        ValidationMessages.invalidFormat('menu ID'),
       );
     }
 
     const result = await this.menuModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
-      throw new NotFoundException(Messages.error.user.notFound(id));
+      throw new NotFoundException(DatabaseMessages.notFound(id));
   }
 }

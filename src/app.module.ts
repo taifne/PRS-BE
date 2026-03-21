@@ -1,12 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SupplierModule } from './domains/supplier/supplier.module';
 import { MedicineModule } from './domains/medidines/medidines.module';
-import { UserModule } from './domains/user/user.module';
-import { AuthModule } from './domains/auth/auth.module';
-import { RoleModule } from './domains/role/role.module';
+import { UserModule } from './core/user/user.module';
+import { AuthModule } from './core/auth/auth.module';
 import { MenuModule } from './domains/menu/menu.module';
 import { CategoryModule } from './domains/category/category.module';
 import { OrderModule } from './domains/order/order.module';
@@ -15,14 +12,15 @@ import { PunchModule } from './domains/user copy/punch.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ResumeModule } from './domains/resume/resume.module';
 import { VocabularyModule } from './domains/vocabulary/vocabulary.module';
-import { QuizModule } from './domains/english_builder/quiz/quiz.module';
+import { QuizModule } from './domains/english-builder/quiz/quiz.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { APP_GUARD, RouterModule } from '@nestjs/core';
 import { ROUTES } from './common/constants/routes.constant';
 import { AuditModule } from './common/audit/audit.module';
-import { JwtAuthGuard } from './domains/auth/guards/jwt-auth.guard';
-import { RolesGuard } from './domains/auth/guards/roles.guard';
+import { JwtAuthGuard } from './core/auth/guards/jwt-auth.guard';
+import { RolesGuard } from './core/auth/guards/roles.guard';
+import { RoleModule } from './core/role/role.module';
 
 @Module({
   imports: [
@@ -90,9 +88,7 @@ import { RolesGuard } from './domains/auth/guards/roles.guard';
       },
     ]),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

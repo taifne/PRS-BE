@@ -1,5 +1,6 @@
 // src/users/dto/search-user.dto.ts
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Expose, Transform, Type } from 'class-transformer';
 import { IsOptional, IsString, IsMongoId } from 'class-validator';
 import { PaginationQueryDto } from 'src/common/base/dtos/pagination-query.dto';
 
@@ -43,4 +44,42 @@ export class SearchUserDto extends PaginationQueryDto {
   @IsOptional()
   @IsMongoId()
   role?: string;
+}
+
+class RoleResponseDto {
+  @Expose()
+  @Transform(({ obj }) => obj._id.toString())
+  id: string;
+
+  @Expose()
+  name: string;
+}
+
+export class UserResponseDto {
+  @Expose()
+  @Transform(({ obj }) => obj._id.toString())
+  id: string;
+
+  @Expose()
+  username: string;
+
+  @Expose()
+  email: string;
+
+  @Expose()
+  displayName: string;
+
+  @Expose()
+  phone: string;
+
+  @Expose()
+  address: string;
+
+  @Expose()
+  isActive: boolean;
+
+  @Expose()
+  @Type(() => RoleResponseDto)
+  roles: RoleResponseDto[];
+
 }

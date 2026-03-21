@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DocumentController } from './document.controller';
-import { DocumentService } from './document.service';
-import { DocumentEntity, DocumentEntitySchema } from './document-version.schema';
-import { Role, RoleSchema } from 'src/domains/role/role.schema';
+import { DocumentController } from '../document/document.controller';
+import { DocumentEntity, DocumentEntitySchema } from '../document/document.schema';
+import { DocumentService } from '../document/document.service';
+import { Role, RoleSchema } from 'src/core/role/role.schema';
 
 @Module({
   imports: [

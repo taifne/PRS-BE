@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 import { DocumentEntity, DocumentEntitySchema } from './document.schema';
-import { Role, RoleSchema } from 'src/domains/role/role.schema';
+import { Role, RoleSchema } from 'src/core/role/role.schema';
 
 @Module({
   imports: [

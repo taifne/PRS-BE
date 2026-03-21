@@ -1,7 +1,7 @@
 // src/users/dto/search-user.dto.ts
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsMongoId } from 'class-validator';
-import { PaginationQueryDto } from 'src/common/base/dto/pagination-query.dto';
+import { PaginationQueryDto } from 'src/common/base/dtos/pagination-query.dto';
 
 export class SearchUserDto extends PaginationQueryDto {
   @ApiPropertyOptional({

@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { DocumentService } from './document.service';
 import { DocumentEntity } from './document.schema';
 import { ApiBearerAuth, ApiTags, ApiOkResponse } from '@nestjs/swagger';
-import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
+import { CommonResponseDto } from 'src/common/base/dtos/common-response.dto';
 
 @ApiTags('Documents')
 @ApiBearerAuth()

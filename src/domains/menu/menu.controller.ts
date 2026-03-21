@@ -13,14 +13,14 @@ import { CreateMenuDto, UpdateMenuDto } from './dto/menu.dto';
 import { plainToInstance } from 'class-transformer';
 
 import { ApiTags, ApiOperation, ApiCreatedResponse } from '@nestjs/swagger';
-import { CommonResponseDto } from 'src/common/base/dto/common-response.dto';
-import { Messages } from 'src/common/message/messages';
-import { RolesList } from 'src/common/types/role';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CommonResponseDto } from 'src/common/base/dtos/common-response.dto';
+import { MenuMessages } from 'src/common/messages';
+import { RolesList } from 'src/common/constants/role';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { MenuResponseDto } from './dto/responses/menu-response.dto';
 
 @ApiTags('Menu')
-@Controller('menus')
+@Controller()
 export class MenuController {
   constructor(private readonly menuService: MenuService) { }
 
@@ -37,7 +37,7 @@ export class MenuController {
     });
     return CommonResponseDto.ok(
       response,
-      Messages.success.menu.created(response.name),
+      MenuMessages.success.created(response.name),
     );
   }
 
@@ -50,7 +50,7 @@ export class MenuController {
     });
     return CommonResponseDto.ok(
       dto,
-      Messages.success.menu.listFetched(dto.length),
+      MenuMessages.success.listFetched(dto.length),
     );
   }
 
@@ -64,7 +64,7 @@ export class MenuController {
     const dto = plainToInstance(MenuResponseDto, menu, {
       excludeExtraneousValues: true,
     });
-    return CommonResponseDto.ok(dto, Messages.success.menu.fetched(dto.name));
+    return CommonResponseDto.ok(dto, MenuMessages.success.fetched(dto.name));
   }
 
   @Patch(':id')
@@ -80,7 +80,7 @@ export class MenuController {
     });
     return CommonResponseDto.ok(
       response,
-      Messages.success.menu.updated(response.name),
+      MenuMessages.success.updated(response.name),
     );
   }
 
@@ -89,6 +89,6 @@ export class MenuController {
   @ApiOperation({ summary: 'Delete menu by ID (Admin only)' })
   async delete(@Param('id') id: string): Promise<CommonResponseDto<void>> {
     await this.menuService.delete(id);
-    return CommonResponseDto.ok(null, Messages.success.menu.deleted(1));
+    return CommonResponseDto.ok(null, MenuMessages.success.deleted(1));
   }
 }

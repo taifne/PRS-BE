@@ -1,5 +1,19 @@
-version: '3.8'
 services:
+  app:
+    build: .
+    container_name: nestjs-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      # Use the service name 'mongo' as the host, not localhost
+      MONGODB_URI: mongodb://admin:123456@mongo:27017/yourDB?authSource=admin
+      NODE_ENV: development
+    networks:
+      - app-network
+    restart: unless-stopped
+
   mongo:
     image: mongo:7
     container_name: mongo-local
@@ -11,6 +25,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 123456
     volumes:
       - mongo-data:/data/db
+    networks:
+      - app-network
 
 volumes:
   mongo-data:
+
+networks:
+  app-network:
+    driver: bridge

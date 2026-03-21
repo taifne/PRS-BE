@@ -60,39 +60,6 @@ export class DocumentService extends BaseService<DocumentEntityDocument> {
   }
 
   /**
-   * Add a collaborator
-   */
-  async addCollaborator(
-    documentId: string,
-    userId: Types.ObjectId,
-    role: 'viewer' | 'commenter' | 'editor' | 'owner' = 'viewer',
-  ): Promise<DocumentEntityDocument> {
-    const doc = await this.findById(documentId);
-
-    // Avoid duplicate
-    if (doc.collaborators.find((c) => c.userId.equals(userId))) {
-      throw new BadRequestException('User is already a collaborator');
-    }
-
-    doc.collaborators.push({ userId, role });
-    return doc.save();
-  }
-
-  /**
-   * Remove a collaborator
-   */
-  async removeCollaborator(
-    documentId: string,
-    userId: Types.ObjectId,
-  ): Promise<DocumentEntityDocument> {
-    const doc = await this.findById(documentId);
-    doc.collaborators = doc.collaborators.filter(
-      (c) => !c.userId.equals(userId),
-    );
-    return doc.save();
-  }
-
-  /**
    * Delete a document (soft delete)
    */
   async deleteDocument(documentId: string): Promise<void> {
