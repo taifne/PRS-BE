@@ -5,7 +5,7 @@ import { Model, Types } from 'mongoose';
 import {
   OrderDetail,
   OrderDetailDocument,
-} from '../order_detail/order_detail.schema';
+} from '../order-detail/order_detail.schema';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto/order.dto';
 import { Order, OrderDocument } from './order.schema';
 
@@ -15,7 +15,7 @@ export class OrderService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     @InjectModel(OrderDetail.name)
     private orderDetailModel: Model<OrderDetailDocument>,
-  ) {}
+  ) { }
 
   // Get Order by orderKey and populate orderDetails
   async getOrderDetailsByOrderKey(orderKey: string) {

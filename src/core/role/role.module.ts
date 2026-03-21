@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoleService } from './role.service';
 import { RoleController } from './role.controller';
 import { Role, RoleSchema } from './role.schema';
-import { Menu, MenuSchema } from 'src/domains/menu/menu.schema';
+import { Menu, MenuSchema } from 'src/core/menu/menu.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([

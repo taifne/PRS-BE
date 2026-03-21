@@ -8,8 +8,8 @@ import {
   Param,
   Patch,
   Query,
-  UseGuards,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -17,12 +17,10 @@ import {
   UpdateUserDto,
   UpdateUserRoleDto,
 } from './dto/user.dto';
-import { User } from './user.schema';
 import { SearchUserDto } from './dto/search-user.dto';
 import {
   ApiBearerAuth,
   ApiBody,
-  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -37,10 +35,13 @@ import { CommonResponseDto } from 'src/common/base/dtos/common-response.dto';
 import { ROUTES } from 'src/common/constants/routes.constant';
 import { AuthService } from '../auth/auth.service';
 import { UserMessages } from 'src/common/messages';
+import { AuditGuard } from '../auth/guards/audit.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 @ApiTags('Administration / User')
 @Controller()
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
 @Controller(ROUTES.ADMINISTRATION.USER)
 export class UserController {
   constructor(private readonly userService: UserService) { }

@@ -5,7 +5,7 @@ import { OrderDetailController } from './order_detail.controller';
 import { OrderDetail, OrderDetailSchema } from './order_detail.schema';
 import { OrderDetailService } from './order_detail.service';
 import { Order, OrderSchema } from '../order/order.schema';
-import { Medicine, MedicineSchema } from '../medidines/medidines.schema';
+import { Medicine, MedicineSchema } from 'src/domains/medidines/medidines.schema';
 
 @Module({
   imports: [
@@ -19,4 +19,4 @@ import { Medicine, MedicineSchema } from '../medidines/medidines.schema';
   controllers: [OrderDetailController],
   exports: [OrderDetailService],
 })
-export class OrderDetailModule {}
+export class OrderDetailModule { }

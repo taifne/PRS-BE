@@ -6,7 +6,7 @@ import { QuizService } from './quiz.service';
 import {
   Vocabulary,
   VocabularySchema,
-} from 'src/domains/vocabulary/vocabulary.schema';
+} from 'src/domains/english-builder/vocabulary/vocabulary.schema';
 
 @Module({
   imports: [
@@ -17,4 +17,4 @@ import {
   controllers: [QuizController],
   providers: [QuizService],
 })
-export class QuizModule {}
+export class QuizModule { }

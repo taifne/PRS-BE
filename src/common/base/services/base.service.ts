@@ -46,6 +46,32 @@ export abstract class BaseService<TDocument extends Document> {
     return query.exec();
   }
 
+  /**
+ * Find multiple documents by filter, throw if none found
+ */
+  async findAllByOrThrow<T = TDocument>(
+    filter: FilterQuery<TDocument>,
+    options?: {
+      populate?: any;
+      lean?: boolean;
+      message?: string;
+      sort?: any;
+    },
+  ): Promise<T[]> {
+    let query = this.model.find(filter);
+
+    if (options?.populate) query = query.populate(options.populate);
+    if (options?.sort) query = query.sort(options.sort);
+
+    const docs = options?.lean ? await query.lean<T>().exec() : await query.exec();
+
+    if (!docs || (Array.isArray(docs) && docs.length === 0)) {
+      throw new NotFoundException(options?.message || 'No resources found');
+    }
+
+    return docs as T[];
+  }
+
   async findOne(id: string): Promise<TDocument> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid ID format');

@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User, UserSchema } from './user.schema';
-import { PunchService } from '../../domains/user copy/punch.service';
-import { Punch, PunchSchema } from '../../domains/user copy/punch.schema';
+import { PunchService } from '../../domains/shopping-cart/punch/punch.service';
+import { Punch, PunchSchema } from '../../domains/shopping-cart/punch/punch.schema';
 import { Role, RoleSchema } from '../role/role.schema';
 import { ROUTES } from 'src/common/constants/routes.constant';
 

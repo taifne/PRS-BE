@@ -8,7 +8,7 @@ import { Order, OrderSchema } from './order.schema';
 import {
   OrderDetail,
   OrderDetailSchema,
-} from '../order_detail/order_detail.schema';
+} from '../order-detail/order_detail.schema';
 
 @Module({
   imports: [
@@ -20,4 +20,4 @@ import {
   controllers: [OrderController],
   providers: [OrderService],
 })
-export class OrderModule {}
+export class OrderModule { }

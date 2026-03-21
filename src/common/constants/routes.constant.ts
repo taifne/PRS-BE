@@ -7,7 +7,7 @@ export const ROUTES = {
       LOGIN: 'login',
       REGISTER: 'register',
       REFRESH: 'refresh',
-      GETME: 'getme'
+      GETME: 'getme',
     },
     ROLE: 'roles',
     MENU: 'menus',
@@ -20,8 +20,8 @@ export const ROUTES = {
     ORDER: 'orders',
     ORDER_DETAIL: 'order-details',
   },
-  COBALLATIVETEXT: {
-    ROOT: 'inventory',
+  COLLABORATIVE: {
+    ROOT: 'collaborative',
     DOCUMENT: 'document',
     DOCUMENTVERSION: 'document-version',
     CATEGORY: 'categories',

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Supplier } from '../supplier/supplier.schema';
-import { Category } from '../category/category.schema';
+import { Supplier } from '../shopping-cart/supplier/supplier.schema';
+import { Category } from '../shopping-cart/category/category.schema';
 
 export type MedicineDocument = Medicine & Document;
 

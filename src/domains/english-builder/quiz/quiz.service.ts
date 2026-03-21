@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import {
   Vocabulary,
   VocabularyDocument,
-} from 'src/domains/vocabulary/vocabulary.schema';
+} from 'src/domains/english-builder/vocabulary/vocabulary.schema';
 import {
   GenerateQuizDto,
   QuizQuestionDto,
@@ -17,7 +17,7 @@ import {
 export class QuizService {
   constructor(
     @InjectModel(Vocabulary.name) private vocabModel: Model<VocabularyDocument>,
-  ) {}
+  ) { }
 
   private pickDistractors(
     correct: string,

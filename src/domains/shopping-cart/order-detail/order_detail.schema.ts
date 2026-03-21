@@ -1,7 +1,6 @@
-// src/orders/schemas/order-detail.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Medicine } from '../medidines/medidines.schema';
+import { Medicine } from 'src/domains/medidines/medidines.schema';
 
 export type OrderDetailDocument = OrderDetail & Document;
 

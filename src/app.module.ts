@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SupplierModule } from './domains/supplier/supplier.module';
+import { SupplierModule } from './domains/shopping-cart/supplier/supplier.module';
 import { MedicineModule } from './domains/medidines/medidines.module';
 import { UserModule } from './core/user/user.module';
 import { AuthModule } from './core/auth/auth.module';
-import { MenuModule } from './domains/menu/menu.module';
-import { CategoryModule } from './domains/category/category.module';
-import { OrderModule } from './domains/order/order.module';
-import { OrderDetailModule } from './domains/order_detail/order_detail.module';
-import { PunchModule } from './domains/user copy/punch.module';
+import { MenuModule } from './core/menu/menu.module';
+import { CategoryModule } from './domains/shopping-cart/category/category.module';
+import { PunchModule } from './domains/shopping-cart/punch/punch.module';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { ResumeModule } from './domains/resume/resume.module';
-import { VocabularyModule } from './domains/vocabulary/vocabulary.module';
+import { ResumeModule } from './domains/resume-maker/resume/resume.module';
+import { VocabularyModule } from './domains/english-builder/vocabulary/vocabulary.module';
 import { QuizModule } from './domains/english-builder/quiz/quiz.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -21,6 +19,9 @@ import { AuditModule } from './common/audit/audit.module';
 import { JwtAuthGuard } from './core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './core/auth/guards/roles.guard';
 import { RoleModule } from './core/role/role.module';
+import { OrderDetailModule } from './domains/shopping-cart/order-detail/order_detail.module';
+import { OrderModule } from './domains/shopping-cart/order/order.module';
+import { CollaborativeModule } from './domains/coballative-text/coballative-module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { RoleModule } from './core/role/role.module';
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
     }),
+    CollaborativeModule,
     UserModule,
     AuthModule,
     RoleModule,
@@ -52,6 +54,10 @@ import { RoleModule } from './core/role/role.module';
     QuizModule,
     AuditModule,
     RouterModule.register([
+      {
+        path: ROUTES.COLLABORATIVE.ROOT,
+        module: CollaborativeModule,
+      },
       {
         path: ROUTES.ADMINISTRATION.ROOT,
         children: [

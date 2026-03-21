@@ -1,11 +1,9 @@
-// src/orders/order-detail.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateOrderDetailDto } from './dto/order_detail.dto';
 import { OrderDetail, OrderDetailDocument } from './order_detail.schema';
 import { Order, OrderDocument } from '../order/order.schema';
-import { Medicine, MedicineDocument } from '../medidines/medidines.schema';
+import { Medicine, MedicineDocument } from 'src/domains/medidines/medidines.schema';
 
 @Injectable()
 export class OrderDetailService {
@@ -15,8 +13,8 @@ export class OrderDetailService {
     @InjectModel(Order.name)
     private orderModel: Model<OrderDocument>,
     @InjectModel(Medicine.name)
-    private medicineModel: Model<MedicineDocument>, // Inject Medicine
-  ) {}
+    private medicineModel: Model<MedicineDocument>,
+  ) { }
 
   async createOrderDetail(dto: {
     orderKey: string;
@@ -34,12 +32,11 @@ export class OrderDetailService {
       totalPrice,
     });
 
-    // Step 2: Update Order
     const order = await this.orderModel.findOneAndUpdate(
       { orderKey: dto.orderKey },
       {
         $push: { orderDetails: orderDetail._id },
-        $inc: { totalAmount: totalPrice }, // ✅ Increment totalAmount
+        $inc: { totalAmount: totalPrice },
       },
       { new: true },
     );
@@ -48,7 +45,6 @@ export class OrderDetailService {
       throw new NotFoundException('Order not found');
     }
 
-    // Step 3: Update medicine stock
     const medicine = await this.medicineModel.findById(dto.medicine);
     if (!medicine) {
       throw new NotFoundException('Medicine not found');

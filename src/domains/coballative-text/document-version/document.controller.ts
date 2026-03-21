@@ -11,7 +11,7 @@ import { ROUTES } from 'src/common/constants/routes.constant';
 @Controller()
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, AuditGuard)
-@Controller(ROUTES.COBALLATIVETEXT.DOCUMENTVERSION)
+@Controller(ROUTES.COLLABORATIVE.DOCUMENTVERSION)
 export class DocumentVersionController {
   constructor(private readonly versionService: DocumentVersionService) { }
 }

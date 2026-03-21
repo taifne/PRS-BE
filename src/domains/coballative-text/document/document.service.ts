@@ -1,86 +1,58 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-
-import { BaseService } from 'src/common/base';
-import { DocumentEntity, DocumentEntityDocument } from './document.schema';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { plainToInstance } from "class-transformer";
+import { Model, Types } from "mongoose";
+import { BaseService } from "src/common";
+import { DocumentEntityDocument, DocumentEntity } from "./document.schema";
+import { UpdateDocumentDto } from "./dto/requests/update-document.dto";
+import { DocumentResponseDto } from "./dto/response/document-response.dto";
+import { CreateDocumentDto } from "./dto/requests/create-document.dto";
 
 @Injectable()
 export class DocumentService extends BaseService<DocumentEntityDocument> {
   constructor(
-    @InjectModel(DocumentEntity.name)
-    private readonly documentModel: Model<DocumentEntityDocument>,
+    @InjectModel(DocumentEntity.name) private readonly documentModel: Model<DocumentEntityDocument>,
   ) {
     super(documentModel);
   }
 
-  /**
-   * Find a document by its ID
-   */
-  async findById(documentId: string): Promise<DocumentEntityDocument> {
-    if (!Types.ObjectId.isValid(documentId)) {
-      throw new BadRequestException('Invalid document ID');
-    }
-
-    const doc = await this.documentModel.findById(documentId).exec();
-    if (!doc) {
-      throw new NotFoundException(`Document ${documentId} not found`);
-    }
-    return doc;
+  /** Create a new document */
+  async createDocument(createDto: CreateDocumentDto): Promise<DocumentResponseDto> {
+    const document = await this.create(createDto);
+    return plainToInstance(DocumentResponseDto, document, { excludeExtraneousValues: true });
   }
 
-  /**
-   * Create a new document
-   */
-  async createDocument(
-    title: string,
-    ownerId: Types.ObjectId,
-    content = '',
-  ): Promise<DocumentEntityDocument> {
-    const newDoc = new this.documentModel({
-      title,
-      ownerId,
-      content,
-      collaborators: [{ userId: ownerId, role: 'owner' }],
-    });
+  async findAllByOwner(ownerId: string): Promise<DocumentResponseDto[]> {
+    const docs = await this.findAllByOrThrow<DocumentEntity>(
+      { ownerId, isDeleted: false },
+      {
+        lean: true,
+        message: `No documents found for owner ${ownerId}`,
+        populate: {
+          path: 'collaborators',
+          select: 'username email displayName',
+        },
+      },
+    );
 
-    return newDoc.save();
+    return plainToInstance(DocumentResponseDto, docs, { excludeExtraneousValues: true });
   }
 
-  /**
-   * Update document content
-   */
-  async updateContent(
-    documentId: string,
-    content: string,
-  ): Promise<DocumentEntityDocument> {
-    const doc = await this.findById(documentId);
-    doc.content = content;
-    return doc.save();
+  /** Get one document by ID */
+  async getById(id: string): Promise<DocumentResponseDto> {
+    const doc = await super.findOne(id); // calls base service
+    return plainToInstance(DocumentResponseDto, doc, { excludeExtraneousValues: true });
   }
 
-  /**
-   * Delete a document (soft delete)
-   */
-  async deleteDocument(documentId: string): Promise<void> {
-    const doc = await this.findById(documentId);
-    doc.isDeleted = true;
-    await doc.save();
+  /** Update a document by ID */
+  async updateDocument(id: string, dto: UpdateDocumentDto): Promise<DocumentResponseDto> {
+    const updated = await super.update(id, dto); // calls base service
+    return plainToInstance(DocumentResponseDto, updated, { excludeExtraneousValues: true });
   }
 
-  /**
-   * List documents with optional filters
-   */
-  async findDocuments(
-    ownerId?: Types.ObjectId,
-    collaboratorId?: Types.ObjectId,
-  ): Promise<DocumentEntityDocument[]> {
-    const query: any = { isDeleted: false };
-
-    if (ownerId) query.ownerId = ownerId;
-    if (collaboratorId)
-      query['collaborators.userId'] = collaboratorId;
-
-    return this.documentModel.find(query).exec();
+  /** Soft delete a document */
+  async softDeleteDocument(id: string): Promise<void> {
+    await super.findOne(id); // ensure it exists
+    await super.update(id, { isDeleted: true });
   }
 }
