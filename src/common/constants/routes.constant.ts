@@ -23,8 +23,8 @@ export const ROUTES = {
   COLLABORATIVE: {
     ROOT: 'collaborative',
     DOCUMENT: 'document',
-    DOCUMENTVERSION: 'document-version',
-    CATEGORY: 'categories',
+    DOCUMENT_VERSION: 'document-version',
+    DOCUMENT_CURSOR: 'document-cursor',
     ORDER: 'orders',
     ORDER_DETAIL: 'order-details',
   },
