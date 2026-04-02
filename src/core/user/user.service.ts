@@ -23,7 +23,9 @@ export class UserService extends BaseService<UserDocument> {
   ) {
     super(userModel);
   }
-
+  async updateOne(filter: any, update: any): Promise<any> {
+    return this.model.updateOne(filter, update).exec();
+  }
   async findByEmail(email: string): Promise<UserWithRoles | null> {
     return this.model
       .findOne({ email })

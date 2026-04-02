@@ -19,7 +19,7 @@ export class LoginDto {
 
   @ApiProperty({
     description: 'User password',
-    example: 'strongPassword123',
+    example: 'strongPassword12',
     minLength: 6,
     required: true,
   })

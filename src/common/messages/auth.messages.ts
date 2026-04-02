@@ -4,7 +4,8 @@ export const AuthMessages = {
             name ? `User ${name} logged in successfully` : 'Logged in successfully',
         loggedOut: 'Logged out successfully',
         tokenRefreshed: 'Token refreshed successfully',
-        getMe: 'Fetch Profile successfully'
+        getMe: 'Fetch Profile successfully',
+
     },
     error: {
         unauthorized: 'You are not authorized to perform this action',

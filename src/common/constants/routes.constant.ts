@@ -8,6 +8,7 @@ export const ROUTES = {
       REGISTER: 'register',
       REFRESH: 'refresh',
       GETME: 'getme',
+      LOGOUT: 'logout'
     },
     ROLE: 'roles',
     MENU: 'menus',

@@ -29,6 +29,7 @@ import { CommonResponseDto } from 'src/common/base/dtos/common-response.dto';
 import { RefreshTokenDto } from './dto/refetch-token.dto';
 import { ROUTES } from 'src/common/constants/routes.constant';
 import { AuthMessages, UserMessages } from 'src/common/messages';
+import { LogoutDto } from './dto/logout.dto';
 
 @ApiTags('Authentication')
 @Controller('')
@@ -110,6 +111,26 @@ export class AuthController {
     return CommonResponseDto.ok(
       newToken,
       AuthMessages.success.tokenRefreshed,
+    );
+  }
+  @Public()
+  @Post(ROUTES.ADMINISTRATION.AUTH.LOGOUT)
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
+  @ApiBody({ type: LogoutDto })
+  @ApiOkResponse({
+    description: 'User logged out successfully',
+  })
+  async logout(
+    @Body() body: LogoutDto,
+  ): Promise<CommonResponseDto<null>> {
+    const { refreshToken } = body;
+
+    await this.authService.logout(refreshToken);
+
+    return CommonResponseDto.ok(
+      null,
+      AuthMessages.success.loggedOut,
     );
   }
 }

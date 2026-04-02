@@ -37,6 +37,11 @@ export class User extends BaseEntity {
 
   @Prop({ default: true })
   isActive: boolean;
+  @Prop()
+  refreshToken: string;
+
+  @Prop()
+  refreshTokenExpires: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

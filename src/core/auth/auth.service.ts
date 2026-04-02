@@ -149,4 +149,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
+  // Add logout method
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      // Verify refresh token (optional - just to get user info)
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET || "set_later",
+      });
+
+      // Remove refresh token from database
+      await this.userService.updateOne(
+        { _id: payload.sub, refreshToken: refreshToken },
+        {
+          $unset: { refreshToken: 1, refreshTokenExpires: 1 },
+        }
+      );
+
+      // Note: Even if token is invalid or user not found, we don't throw
+      // This prevents attackers from knowing if the token was valid
+    } catch (error) {
+      // Log error for debugging but don't throw
+      console.error('Logout error:', error);
+      // We still return success to client
+    }
+  }
 }
