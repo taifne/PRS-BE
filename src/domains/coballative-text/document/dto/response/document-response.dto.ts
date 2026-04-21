@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
-import { Types } from 'mongoose';
 
 export class CollaboratorResponseDto {
     @ApiProperty({ description: 'User ID' })
@@ -20,6 +19,7 @@ export class CollaboratorResponseDto {
     @Expose()
     email: string;
 }
+
 export class DocumentResponseDto {
     @ApiProperty({ description: 'Document ID' })
     @Expose({ name: '_id' })
@@ -39,10 +39,44 @@ export class DocumentResponseDto {
     @Transform(({ obj }) => obj.ownerId?.toString(), { toClassOnly: true })
     ownerId: string;
 
-    @ApiProperty({ description: 'List of collaborators', type: [CollaboratorResponseDto] })
+    @ApiProperty({
+        description: 'List of collaborators',
+        type: [CollaboratorResponseDto],
+    })
     @Expose()
     @Type(() => CollaboratorResponseDto)
     collaborators: CollaboratorResponseDto[];
+
+    // ✅ NEW: viewers (can be IDs or populated users)
+    @ApiProperty({
+        description: 'List of viewer user IDs',
+        type: [String],
+    })
+    @Expose()
+    @Transform(
+        ({ obj }) =>
+            obj.viewers?.map((v) =>
+                typeof v === 'object' ? v._id?.toString() : v?.toString(),
+            ),
+        { toClassOnly: true },
+    )
+    viewers: string[];
+
+    // ✅ NEW: privacy
+    @ApiProperty({
+        description: 'Privacy setting',
+        enum: ['public', 'private'],
+    })
+    @Expose()
+    privacy: string;
+
+    // ✅ NEW: documentTypeId
+    @ApiProperty({ description: 'Document type/category ID', required: false })
+    @Expose()
+    @Transform(({ obj }) => obj.documentTypeId?.toString(), {
+        toClassOnly: true,
+    })
+    documentTypeId?: string;
 
     @ApiProperty({ description: 'Soft delete flag' })
     @Expose()

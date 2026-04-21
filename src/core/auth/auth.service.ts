@@ -126,7 +126,10 @@ export class AuthService {
   }
   async refreshToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
     try {
-      const payload = this.jwtService.verify(refreshToken);
+      // ✅ Use the same refresh secret for verification
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET || "set_later",
+      });
 
       // Optional: check hashed refresh token in DB for extra security
       const user = await this.userService.findOneByOrThrow(

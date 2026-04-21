@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, Delete, Post } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Body, Delete, Post, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiParam } from '@nestjs/swagger';
 import { DocumentService } from './document.service';
 import { CommonResponseDto, ROUTES } from 'src/common';
@@ -26,6 +26,8 @@ export class DocumentController {
   }
 
 
+
+
   @Get(':id')
   @ApiOperation({ summary: 'Get document by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Document ID' })
@@ -33,9 +35,16 @@ export class DocumentController {
   @ApiNotFoundResponse({ description: 'Document not found', type: CommonResponseDto })
   async findOne(
     @Param('id') id: string,
+    @Req() req: Request,
   ): Promise<CommonResponseDto<DocumentResponseDto>> {
-    const dto = await this.documentService.getById(id);
-    return CommonResponseDto.ok(dto, DocumentMessages.success.fetched(dto.title));
+    const userId = (req as any).user?._id || (req as any).user?.id;
+
+    const dto = await this.documentService.getById(id, userId);
+
+    return CommonResponseDto.ok(
+      dto,
+      DocumentMessages.success.fetched(dto.title),
+    );
   }
 
   @Patch(':id')

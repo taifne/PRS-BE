@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { plainToInstance } from "class-transformer";
 import { Model, Types } from "mongoose";
 import { BaseService } from "src/common";
-import { DocumentEntityDocument, DocumentEntity } from "./document.schema";
+import { DocumentEntityDocument, DocumentEntity, DocumentPrivacy } from "./document.schema";
 import { UpdateDocumentDto } from "./dto/requests/update-document.dto";
 import { DocumentResponseDto } from "./dto/response/document-response.dto";
 import { CreateDocumentDto } from "./dto/requests/create-document.dto";
@@ -18,6 +18,7 @@ export class DocumentService extends BaseService<DocumentEntityDocument> {
 
   /** Create a new document */
   async createDocument(createDto: CreateDocumentDto): Promise<DocumentResponseDto> {
+    console.log("createDto", createDto);
     const document = await this.create(createDto);
     return plainToInstance(DocumentResponseDto, document, { excludeExtraneousValues: true });
   }
@@ -28,20 +29,61 @@ export class DocumentService extends BaseService<DocumentEntityDocument> {
       {
         lean: true,
         message: `No documents found for owner ${ownerId}`,
-        populate: {
-          path: 'collaborators',
-          select: 'username email displayName',
-        },
+        populate: [
+          {
+            path: 'ownerId',
+            select: 'username email displayName',
+          },
+          {
+            path: 'collaborators',
+            select: 'username email displayName',
+          },
+          {
+            path: 'viewers',
+            select: 'username email displayName',
+          },
+          {
+            path: 'documentTypeId',
+            select: 'name', // adjust based on your schema
+          },
+        ],
       },
     );
 
-    return plainToInstance(DocumentResponseDto, docs, { excludeExtraneousValues: true });
+    return plainToInstance(DocumentResponseDto, docs, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  /** Get one document by ID */
-  async getById(id: string): Promise<DocumentResponseDto> {
-    const doc = await super.findOne(id); // calls base service
-    return plainToInstance(DocumentResponseDto, doc, { excludeExtraneousValues: true });
+
+  async getById(id: string, currentUserId: string): Promise<DocumentResponseDto> {
+    const doc = await super.findOne(id);
+
+    if (!doc || doc.isDeleted) {
+      throw new NotFoundException('Document not found');
+    }
+
+    const userId = currentUserId.toString();
+
+    const isOwner = doc.ownerId?.toString() === userId;
+
+    const isCollaborator = doc.collaborators?.some(
+      (c) => c.toString() === userId,
+    );
+
+    const isViewer = doc.viewers?.some(
+      (v) => v.toString() === userId,
+    );
+
+    const isPublic = doc.privacy === DocumentPrivacy.PUBLIC;
+
+    if (!isOwner && !isCollaborator && !isViewer && !isPublic) {
+      throw new ForbiddenException('You do not have access to this document');
+    }
+
+    return plainToInstance(DocumentResponseDto, doc, {
+      excludeExtraneousValues: true,
+    });
   }
 
   /** Update a document by ID */
