@@ -54,7 +54,7 @@ export class RoleController {
   @ApiOperation({ summary: 'Get all roles' })
   @ApiOkResponse({ type: CommonResponseDto })
   async findAll(): Promise<CommonResponseDto<RoleResponseDto[]>> {
-    const roles = await this.roleService.findAll();
+    const roles = await this.roleService.findAll('menus');
 
     const dto = plainToInstance(RoleResponseDto, roles, {
       excludeExtraneousValues: true,

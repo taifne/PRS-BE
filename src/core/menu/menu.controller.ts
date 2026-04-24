@@ -45,6 +45,8 @@ export class MenuController {
   @ApiOperation({ summary: 'Get all menus' })
   async findAll(): Promise<CommonResponseDto<MenuResponseDto[]>> {
     const menus = await this.menuService.findAll();
+    console.log(menus);
+
     const dto = plainToInstance(MenuResponseDto, menus, {
       excludeExtraneousValues: true,
     });
