@@ -66,7 +66,7 @@ export class UserService extends BaseService<UserDocument> {
 
     const updatedUser = await this.model
       .findByIdAndUpdate(userId, { role: roleId }, { new: true })
-      .populate('role')
+      .populate('roles')
       .exec();
 
     if (!updatedUser) {
@@ -96,7 +96,7 @@ export class UserService extends BaseService<UserDocument> {
     const query: any = {};
 
     if (username?.trim())
-      query.displayName = { $regex: username.trim(), $options: 'i' };
+      query.username = { $regex: username.trim(), $options: 'i' };
     if (email?.trim()) query.email = { $regex: email.trim(), $options: 'i' };
     if (address?.trim())
       query.address = { $regex: address.trim(), $options: 'i' };
