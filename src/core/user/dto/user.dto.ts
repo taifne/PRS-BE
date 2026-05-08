@@ -6,6 +6,8 @@ import {
   IsBoolean,
   IsDateString,
   IsMongoId,
+  IsArray,
+  ArrayNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -33,13 +35,13 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({
-    example: '64e23f1c8d3b2a5f9a87c123',
-    description: 'Role ID reference (MongoDB ObjectId)',
-  })
-  @IsOptional()
-  @IsString()
-  role?: string;
+@ApiPropertyOptional({
+  example: ['64e23f1c8d3b2a5f9a87c123'],
+})
+@IsOptional()
+@IsArray()
+@IsMongoId({ each: true })
+roleIds?: string[];
 
   @ApiPropertyOptional({
     example: 'John Doe',
@@ -156,11 +158,13 @@ export class UpdateUserDto {
   updatedBy?: string;
 }
 
-export class UpdateUserRoleDto {
+export class UpdateUserRolesDto {
   @ApiProperty({
-    example: '64e23f1c8d3b2a5f9a87c127',
-    description: 'New role ID for the user',
+    example: ['64e23f1c8d3b2a5f9a87c127', '64e23f1c8d3b2a5f9a87c128'],
+    description: 'Danh sách Role ID',
   })
-  @IsMongoId()
-  roleId: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsMongoId({ each: true })
+  roleIds: string[];
 }

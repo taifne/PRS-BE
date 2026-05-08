@@ -1,6 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsOptional, IsMongoId, IsArray, IsIn } from "class-validator";
-import { Types } from "mongoose";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, IsArray, IsMongoId, IsNotEmpty } from 'class-validator';
 
 export class CreateDocumentDto {
     @ApiProperty({ description: 'Document title' })
@@ -8,11 +7,7 @@ export class CreateDocumentDto {
     @IsString()
     title: string;
 
-    @ApiProperty({
-        description: 'Document content',
-        required: false,
-        default: ''
-    })
+    @ApiPropertyOptional({ description: 'Document content' })
     @IsOptional()
     @IsString()
     content?: string;
@@ -20,43 +15,27 @@ export class CreateDocumentDto {
     @ApiProperty({ description: 'Owner user ID' })
     @IsNotEmpty()
     @IsMongoId()
-    ownerId: Types.ObjectId;
+    ownerId: string;  // ✅ Keep as string for DTO
 
-    @ApiProperty({
-        description: 'Collaborator user IDs',
-        type: [String],
-        required: false
-    })
+    @ApiPropertyOptional({ description: 'List of collaborator user IDs', type: [String] })
     @IsOptional()
     @IsArray()
     @IsMongoId({ each: true })
-    collaborators?: Types.ObjectId[];
+    collaborators?: string[];
 
-    @ApiProperty({
-        description: 'Viewer user IDs',
-        type: [String],
-        required: false
-    })
+    @ApiPropertyOptional({ description: 'List of viewer user IDs', type: [String] })
     @IsOptional()
     @IsArray()
     @IsMongoId({ each: true })
-    viewers?: Types.ObjectId[];
+    viewers?: string[];
 
-    @ApiProperty({
-        description: '"public" or "private"',
-        required: false,
-        default: 'private'
-    })
+    @ApiPropertyOptional({ description: 'Privacy setting', enum: ['public', 'private'], default: 'private' })
     @IsOptional()
     @IsString()
-    @IsIn(['public', 'private'])
-    privacy?: string;
+    privacy?: 'public' | 'private';
 
-    @ApiProperty({
-        description: 'Document type/category ID',
-        required: false
-    })
+    @ApiPropertyOptional({ description: 'Document type ID' })
     @IsOptional()
     @IsMongoId()
-    documentTypeId?: Types.ObjectId;
+    documentTypeId?: string;
 }

@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -13,7 +14,8 @@ import { PunchService } from '../../domains/shopping-cart/punch/punch.service';
 import { UserWithRoles } from './interfaces/user-with-roles.interface';
 import { plainToInstance } from 'class-transformer';
 import { DatabaseMessages, UserMessages, ValidationMessages } from 'src/common/messages';
-
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/user.dto';
 @Injectable()
 export class UserService extends BaseService<UserDocument> {
   constructor(
@@ -22,6 +24,75 @@ export class UserService extends BaseService<UserDocument> {
     private readonly punchService: PunchService,
   ) {
     super(userModel);
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+    const { roleIds = [], password, ...rest } = createUserDto;
+
+    let roles: string[] = roleIds;
+
+    // ✅ Validate ObjectId (only if roles array has items)
+    if (roles.length > 0) {
+      const invalidIds = roles.filter(id => !Types.ObjectId.isValid(id));
+      if (invalidIds.length) {
+        throw new BadRequestException(`Invalid roleIds: ${invalidIds.join(', ')}`);
+      }
+
+      // ✅ Validate roles exist in database
+      const foundRoles = await this.roleModel.find({
+        _id: { $in: roles },
+      });
+
+      if (foundRoles.length !== roles.length) {
+        const foundIds = foundRoles.map(role => role._id.toString());
+        const missingIds = roles.filter(id => !foundIds.includes(id));
+        throw new BadRequestException(`Roles not found: ${missingIds.join(', ')}`);
+      }
+    }
+
+    // ✅ Default role if no roles provided
+    if (!roles.length) {
+      const defaultRole = await this.roleModel.findOne({ name: 'user' });
+      if (defaultRole) {
+        roles = [defaultRole._id.toString()];
+      } else {
+        // ✅ Fallback: create default 'user' role if it doesn't exist
+        const newDefaultRole = await this.roleModel.create({
+          name: 'user',
+          description: 'Default user role',
+          isActive: true,
+        });
+        roles = [newDefaultRole._id.toString()];
+      }
+    }
+
+    // ✅ Check if username already exists
+    const existingUsername = await this.model.findOne({
+      username: rest.username,
+    });
+    if (existingUsername) {
+      throw new ConflictException(`Username "${rest.username}" already exists`);
+    }
+
+    // ✅ Check if email already exists
+    const existingEmail = await this.model.findOne({
+      email: rest.email,
+    });
+    if (existingEmail) {
+      throw new ConflictException(`Email "${rest.email}" already exists`);
+    }
+
+    // ✅ Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ Save user
+    const newUser = new this.model({
+      ...rest,
+      password: hashedPassword,
+      roles,
+    });
+
+    return newUser.save();
   }
   async updateOne(filter: any, update: any): Promise<any> {
     return this.model.updateOne(filter, update).exec();
@@ -59,22 +130,39 @@ export class UserService extends BaseService<UserDocument> {
     return roles.map((role) => role.name);
   }
 
-  async updateRole(userId: string, roleId: string): Promise<UserDocument> {
-    if (!Types.ObjectId.isValid(roleId)) {
-      throw new NotFoundException(DatabaseMessages.notFound(roleId));
-    }
+async updateRoles(
+  userId: string,
+  roleIds: string[],
+): Promise<UserDocument> {
 
-    const updatedUser = await this.model
-      .findByIdAndUpdate(userId, { role: roleId }, { new: true })
-      .populate('roles')
-      .exec();
-
-    if (!updatedUser) {
-      throw new NotFoundException(DatabaseMessages.notFound(userId));
-    }
-
-    return updatedUser;
+  // validate userId
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new NotFoundException(DatabaseMessages.notFound(userId));
   }
+
+  // validate all roleIds
+  const invalidIds = roleIds.filter(id => !Types.ObjectId.isValid(id));
+  if (invalidIds.length > 0) {
+    throw new NotFoundException(
+      DatabaseMessages.notFound(`Invalid roleIds: ${invalidIds.join(', ')}`),
+    );
+  }
+
+  const updatedUser = await this.model
+    .findByIdAndUpdate(
+      userId,
+      { roles: roleIds }, // ✅ FIX HERE (array)
+      { new: true },
+    )
+    .populate('roles')
+    .exec();
+
+  if (!updatedUser) {
+    throw new NotFoundException(DatabaseMessages.notFound(userId));
+  }
+
+  return updatedUser;
+}
 
 
   async searchUsers(filters: SearchUserDto): Promise<{

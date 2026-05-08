@@ -15,7 +15,7 @@ import { UserService } from './user.service';
 import {
   CreateUserDto,
   UpdateUserDto,
-  UpdateUserRoleDto,
+  UpdateUserRolesDto,
 } from './dto/user.dto';
 import { SearchUserDto } from './dto/search-user.dto';
 import {
@@ -193,7 +193,7 @@ export class UserController {
   @Patch(':id/role')
   @ApiOperation({ summary: 'Update user role' })
   @ApiParam({ name: 'id', type: String, description: 'User ID' })
-  @ApiBody({ type: UpdateUserRoleDto })
+  @ApiBody({ type: UpdateUserRolesDto })
   @ApiOkResponse({
     description: 'User role updated successfully',
     type: CommonResponseDto,
@@ -204,11 +204,11 @@ export class UserController {
   })
   async updateUserRole(
     @Param('id') userId: string,
-    @Body() updateUserRoleDto: UpdateUserRoleDto,
+    @Body() updateUserRoleDto: UpdateUserRolesDto,
   ) {
-    const updatedUser = await this.userService.updateRole(
+    const updatedUser = await this.userService.updateRoles(
       userId,
-      updateUserRoleDto.roleId,
+      updateUserRoleDto.roleIds,
     );
 
     return CommonResponseDto.ok(

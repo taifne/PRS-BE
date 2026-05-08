@@ -5,6 +5,7 @@ import { DocumentService } from './document.service';
 import { DocumentEntity, DocumentEntitySchema } from './document.schema';
 import { Role, RoleSchema } from 'src/core/role/role.schema';
 import { DocumentTypeEntity, DocumentTypeEntitySchema } from '../document-type/document-type.schema';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DocumentTypeEntity, DocumentTypeEntitySchema } from '../document-type/d
       { name: Role.name, schema: RoleSchema },
       { name: DocumentTypeEntity.name, schema: DocumentTypeEntitySchema },
     ]),
+    NotificationModule
   ],
   providers: [DocumentService],
   controllers: [DocumentController],
