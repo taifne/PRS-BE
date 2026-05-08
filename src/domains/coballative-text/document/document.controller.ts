@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Patch, Body, Delete, Post, Req, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { DocumentService } from './document.service';
-import { CommonResponseDto, ROUTES } from 'src/common';
+import { CommonResponseDto, Roles, RolesList, ROUTES } from 'src/common';
 import { UpdateDocumentDto } from './dto/requests/update-document.dto';
 import { DocumentResponseDto } from './dto/response/document-response.dto';
 import { DocumentMessages } from 'src/common/messages';
@@ -43,7 +43,27 @@ export class DocumentController {
     const message = DocumentMessages.success.listFetched(dtos.length);
     return CommonResponseDto.ok(dtos, message);
   }
+@Get('collaborator/:userId')
+@ApiOperation({ summary: 'Get documents where user is a collaborator' })
+@ApiParam({ name: 'userId', type: String, description: 'User ID' })
+async findDocumentsByCollaborator(
+  @Param('userId') userId: string,
+): Promise<CommonResponseDto<DocumentResponseDto[]>> {
+  const dtos = await this.documentService.findDocumentsByCollaborator(userId);
+  const message = DocumentMessages.success.listFetched(dtos.length);
+  return CommonResponseDto.ok(dtos, message);
+}
 
+@Get('viewer/:userId')
+@ApiOperation({ summary: 'Get documents where user is a viewer' })
+@ApiParam({ name: 'userId', type: String, description: 'User ID' })
+async findDocumentsByViewer(
+  @Param('userId') userId: string,
+): Promise<CommonResponseDto<DocumentResponseDto[]>> {
+  const dtos = await this.documentService.findDocumentsByViewer(userId);
+  const message = DocumentMessages.success.listFetched(dtos.length);
+  return CommonResponseDto.ok(dtos, message);
+}
   @Get(':id')
   @ApiOperation({ summary: 'Get document by ID' })
   @ApiParam({ name: 'id', type: String, description: 'Document ID' })
@@ -98,4 +118,30 @@ export class DocumentController {
     await this.documentService.softDeleteDocument(id);
     return CommonResponseDto.ok(null, DocumentMessages.success.deleted(1));
   }
+
+  
+@Get('admin/all')
+@Roles(RolesList.ADMIN)
+@ApiOperation({ summary: 'Get all documents (Admin only)' })
+@ApiQuery({ name: 'page', required: false, type: Number })
+@ApiQuery({ name: 'limit', required: false, type: Number })
+@ApiQuery({ name: 'search', required: false, type: String })
+@ApiQuery({ name: 'privacy', required: false, enum: ['public', 'private'] })
+@ApiQuery({ name: 'isDeleted', required: false, type: Boolean })
+async findAllDocuments(
+  @Query('page') page: number = 1,
+  @Query('limit') limit: number = 10,
+  @Query('search') search?: string,
+  @Query('privacy') privacy?: string,
+  @Query('isDeleted') isDeleted?: boolean,
+): Promise<CommonResponseDto<DocumentResponseDto[]>> {
+  const result = await this.documentService.findAllDocuments(
+    page, limit, search, privacy, isDeleted
+  );
+  return CommonResponseDto.ok(
+    result.data,
+    'Documents fetched successfully',
+    { page: result.page, limit: result.limit, total: result.total }
+  );
+}
 }

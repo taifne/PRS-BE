@@ -217,61 +217,124 @@ export class DocumentService extends BaseService<DocumentEntityDocument> {
     return plainToInstance(DocumentResponseDto, document, { excludeExtraneousValues: true });
   }
 
-  async findAllByOwner(ownerId: string): Promise<DocumentResponseDto[]> {
-    const docs = await this.documentModel
-      .find({ ownerId: new Types.ObjectId(ownerId), isDeleted: false })
-      .populate('ownerId', 'username email displayName')
-      .populate('collaborators', 'username email displayName')
-      .populate('viewers', 'username email displayName')
-      .populate('documentTypeId', 'name')
-      .lean();
+async findAllByOwner(ownerId: string): Promise<DocumentResponseDto[]> {
+  const docs = await this.documentModel
+    .find({ ownerId: new Types.ObjectId(ownerId), isDeleted: false })
+    .populate('ownerId', 'username email displayName')
+    .populate('collaborators', 'username email displayName')
+    .populate('viewers', 'username email displayName')
+    .populate('documentTypeId', 'name')
+    .lean();
 
-    if (!docs || docs.length === 0) {
-      return [];
-    }
-
-    return plainToInstance(DocumentResponseDto, docs, {
-      excludeExtraneousValues: true,
-    });
+  if (!docs || docs.length === 0) {
+    return [];
   }
 
-  async getById(id: string, currentUserId: string): Promise<DocumentResponseDto> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException('Invalid document ID');
-    }
+  const mappedDocs = docs.map((doc: any) => ({
+    id: doc._id.toString(),
+    title: doc.title,
+    content: doc.content,
+    ownerId: doc.ownerId?._id?.toString() || doc.ownerId?.toString(),
+    collaborators: (doc.collaborators || []).map((c: any) => ({
+      id: c._id?.toString() || c.toString(),
+      username: c.username || 'Unknown',
+      displayName: c.displayName || c.username || 'Unknown User',
+      email: c.email || '',
+    })),
+    viewers: (doc.viewers || []).map((v: any) => v._id?.toString() || v.toString()),
+    privacy: doc.privacy,
+    documentTypeId: doc.documentTypeId?._id?.toString() || doc.documentTypeId?.toString(),
+    documentTypeName: doc.documentTypeId?.name,
+    isDeleted: doc.isDeleted,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  }));
 
-    const doc = await this.documentModel
-      .findById(id)
-      .populate('ownerId', 'username email displayName')
-      .populate('collaborators', 'username email displayName')
-      .populate('viewers', 'username email displayName')
-      .lean();
+  return plainToInstance(DocumentResponseDto, mappedDocs, {
+    excludeExtraneousValues: true,
+  });
+}
 
-    if (!doc || doc.isDeleted) {
-      throw new NotFoundException('Document not found');
-    }
-
-    const userId = currentUserId.toString();
-    const ownerId = doc.ownerId?.['_id']?.toString() || doc.ownerId?.toString();
-
-    const isOwner = ownerId === userId;
-    const isCollaborator = doc.collaborators?.some(
-      (c: any) => c._id?.toString() === userId || c.toString() === userId,
-    );
-    const isViewer = doc.viewers?.some(
-      (v: any) => v._id?.toString() === userId || v.toString() === userId,
-    );
-    const isPublic = doc.privacy === DocumentPrivacy.PUBLIC;
-
-    if (!isOwner && !isCollaborator && !isViewer && !isPublic) {
-      throw new ForbiddenException('You do not have access to this document');
-    }
-
-    return plainToInstance(DocumentResponseDto, doc, {
-      excludeExtraneousValues: true,
-    });
+async getById(id: string, currentUserId: string): Promise<DocumentResponseDto> {
+  if (!Types.ObjectId.isValid(id)) {
+    throw new BadRequestException('Invalid document ID');
   }
 
+  const doc = await this.documentModel
+    .findById(id)
+    .populate('ownerId', 'username email displayName')
+    .populate('collaborators', 'username email displayName')
+    .populate('viewers', 'username email displayName')
+    .lean();
+
+  if (!doc || doc.isDeleted) {
+    throw new NotFoundException('Document not found');
+  }
+
+  const userId = currentUserId.toString();
+  
+  // Extract ownerId
+  const ownerId = doc.ownerId?._id?.toString() || doc.ownerId?.toString();
+  const isOwner = ownerId === userId;
+  const isCollaborator = doc.collaborators?.some(
+    (c: any) => c._id?.toString() === userId || c.toString() === userId,
+  );
+  const isViewer = doc.viewers?.some(
+    (v: any) => v._id?.toString() === userId || v.toString() === userId,
+  );
+  const isPublic = doc.privacy === DocumentPrivacy.PUBLIC;
+
+  if (!isOwner && !isCollaborator && !isViewer && !isPublic) {
+    throw new ForbiddenException('You do not have access to this document');
+  }
+
+  // ✅ Build collaborators array with id
+  const collaborators = (doc.collaborators || []).map((c: any) => {
+    // Get the id correctly
+    let collaboratorId = '';
+    if (c._id) {
+      collaboratorId = c._id.toString();
+    } else if (c.id) {
+      collaboratorId = c.id;
+    } else if (c.toString) {
+      collaboratorId = c.toString();
+    }
+    
+    return {
+      id: collaboratorId,
+      username: c.username || 'Unknown',
+      displayName: c.displayName || c.username || 'Unknown User',
+      email: c.email || '',
+    };
+  }).filter(c => c.id); // Only include if has id
+
+  // Build viewers array
+  const viewers = (doc.viewers || []).map((v: any) => {
+    if (v._id) return v._id.toString();
+    if (v.id) return v.id;
+    if (v.toString) return v.toString();
+    return null;
+  }).filter(Boolean);
+
+  // Build response
+  const response = {
+    id: doc._id.toString(),
+    title: doc.title,
+    content: doc.content,
+    ownerId: ownerId,
+    collaborators: collaborators,
+    viewers: viewers,
+    privacy: doc.privacy,
+    documentTypeId: doc.documentTypeId?.toString(),
+    isDeleted: doc.isDeleted,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
+  };
+
+  return plainToInstance(DocumentResponseDto, response, {
+    excludeExtraneousValues: true,
+  });
+}
   /** Update a document by ID */
   async updateDocument(
     id: string,
@@ -331,4 +394,98 @@ export class DocumentService extends BaseService<DocumentEntityDocument> {
     }
     await this.documentModel.findByIdAndUpdate(id, { isDeleted: true });
   }
+  // Get documents where user is a collaborator
+async findDocumentsByCollaborator(userId: string): Promise<DocumentResponseDto[]> {
+  const docs = await this.documentModel
+    .find({ 
+      collaborators: new Types.ObjectId(userId), 
+      isDeleted: false 
+    })
+    .populate('ownerId', 'username email displayName')
+    .populate('collaborators', 'username email displayName')
+    .populate('viewers', 'username email displayName')
+    .sort({ updatedAt: -1 })
+    .lean();
+
+  if (!docs || docs.length === 0) {
+    return [];
+  }
+
+  return plainToInstance(DocumentResponseDto, docs, {
+    excludeExtraneousValues: true,
+  });
+}
+
+// Get documents where user is a viewer
+async findDocumentsByViewer(userId: string): Promise<DocumentResponseDto[]> {
+  const docs = await this.documentModel
+    .find({ 
+      viewers: new Types.ObjectId(userId), 
+      isDeleted: false 
+    })
+    .populate('ownerId', 'username email displayName')
+    .populate('collaborators', 'username email displayName')
+    .populate('viewers', 'username email displayName')
+    .sort({ updatedAt: -1 })
+    .lean();
+
+  if (!docs || docs.length === 0) {
+    return [];
+  }
+
+  return plainToInstance(DocumentResponseDto, docs, {
+    excludeExtraneousValues: true,
+  });
+}
+async findAllDocuments(
+  page: number = 1,
+  limit: number = 10,
+  search?: string,
+  privacy?: string,
+  isDeleted?: boolean,
+): Promise<{
+  data: DocumentResponseDto[];
+  total: number;
+  page: number;
+  limit: number;
+}> {
+  const query: any = {};
+  
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+    ];
+  }
+  
+  if (privacy) {
+    query.privacy = privacy;
+  }
+  
+  if (isDeleted !== undefined) {
+    query.isDeleted = isDeleted;
+  }
+  
+  const skip = (page - 1) * limit;
+  
+  const [data, total] = await Promise.all([
+    this.documentModel
+      .find(query)
+      .populate('ownerId', 'username email displayName')
+      .populate('collaborators', 'username email displayName')
+      .populate('viewers', 'username email displayName')
+      .populate('documentTypeId', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    this.documentModel.countDocuments(query),
+  ]);
+  
+  const mapped = plainToInstance(DocumentResponseDto, data, {
+    excludeExtraneousValues: true,
+  });
+  
+  return { data: mapped, total, page, limit };
+}
 }
